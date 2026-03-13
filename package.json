@@ -1,0 +1,30 @@
+{
+  "name": "b2c-plugin-catalog-reducer",
+  "version": "1.0.0",
+  "description": "Catalog reducer for Salesforce B2C Commerce XML datasets.",
+  "main": "tmp/reducer.js",
+  "files": [
+    "tmp"
+  ],
+  "author": "Thomas Theunen",
+  "license": "MIT",
+  "scripts": {
+    "postinstall": "npm --prefix tmp install",
+    "start": "npm --prefix tmp start --",
+    "reduce": "npm --prefix tmp start --",
+    "lint": "npm --prefix tmp run lint",
+    "test": "npm --prefix tmp test",
+    "test:coverage": "npm --prefix tmp run test:coverage",
+    "test:ci": "npm --prefix tmp run test:ci",
+    "validate:output": "npm --prefix tmp run validate:output",
+    "benchmark": "npm --prefix tmp run benchmark --"
+  },
+  "keywords": [
+    "b2c",
+    "sfcc",
+    "catalog",
+    "reducer",
+    "xml",
+    "fixtures"
+  ]
+}
