@@ -5,9 +5,31 @@ import globals from "globals";
 
 export default [
   {
-    ignores: ["dist/**", "artifacts/**", "testing/regression/**"],
+    ignores: ["dist/**", "artifacts/**", "testing/regression/**", "tmp/**", "files/filtered/**", "coverage/**"],
   },
   js.configs.recommended,
+  {
+    files: ["bin/**/*.js", "scripts/**/*.js", "reducer.js", "lib/**/*.js", "test/**/*.js"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      globals: {
+        ...globals.node,
+      },
+      sourceType: "commonjs",
+    },
+    rules: {
+      "no-undef": "off",
+      "no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_|^error$",
+          varsIgnorePattern: "^_"
+        }
+      ],
+      "preserve-caught-error": "off",
+    },
+  },
   {
     files: ["src/**/*.ts"],
     languageOptions: {

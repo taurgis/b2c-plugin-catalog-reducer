@@ -24,7 +24,6 @@ coverage/
 # Maven
 target/
 dist/
-tmp/
 
 # JetBrains IDE
 .idea/
@@ -51,6 +50,6 @@ Thumbs.db
 *.mov
 *.wmv
 
-*.xml
-
+/tmp
 /files
+/config

@@ -10,6 +10,9 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
   },
+  "exclude": [
+    "src/**/*.test.ts"
+  ],
   "include": [
     "src/**/*.ts"
   ]

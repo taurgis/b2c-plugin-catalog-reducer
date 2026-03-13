@@ -2,7 +2,9 @@
 
 Catalog Reducer generates smaller, representative Salesforce B2C Commerce catalog datasets from large source XML files.
 
-It keeps product selection configurable, writes derived inventory and pricebook XML outputs, and validates generated files against the bundled XSD schemas.
+It keeps product selection configurable, exposes a root oclif command for reduction workflows, writes derived inventory and pricebook XML outputs, and validates generated files against the bundled XSD schemas.
+
+Repository-local fixtures and sample profiles under `files/` and `config/` are for local development and debugging. They are not part of the published package.
 
 ## Highlights
 
@@ -23,21 +25,33 @@ System requirements:
 
 - `xmllint` must be available on `PATH` for XML schema validation
 
+`npm install` bootstraps both the root CLI and the reducer runtime dependencies.
+
 ## Usage
 
 Run the reducer from the repository root:
 
 ```bash
-npm run reduce -- -i files/source/puma-catalog.xml -o files/filtered/puma-test.xml -p test
+npm run reduce -- -i ./catalog.xml -o ./catalog-reduced.xml -c ./catalog-reducer.json
+```
+
+Direct oclif command:
+
+```bash
+./bin/dev.js catalog reduce -i ./catalog.xml -o ./catalog-reduced.xml -c ./catalog-reducer.json
 ```
 
 Arguments:
 
+- `-c`, `--config`: path to a JSON config file anywhere on disk
 - `-i`, `--input`: source catalog XML file
 - `-o`, `--output`: reduced catalog output file
-- `-p`, `--project`: config profile name from `tmp/config/<profile>.json`
 
-If `-p` is omitted, the default config is used.
+Relative input and output paths are resolved from the directory where you invoke the CLI.
+
+When `--config` is used, relative paths inside `pricebookSourceFiles` are resolved from the config file location.
+
+If `--config` is omitted, the built-in default reducer config is used.
 
 ## Outputs
 
@@ -51,7 +65,7 @@ When a profile uses `pricebookSourceFiles`, the reducer writes one filtered pric
 
 ## Example Config
 
-Profiles live under `tmp/config/`.
+Config files can live anywhere. The example below works as a standalone JSON config file.
 
 ```json
 {
@@ -72,29 +86,35 @@ Profiles live under `tmp/config/`.
 
 ## Examples
 
-Quick validation run:
+Config file from an arbitrary path:
 
 ```bash
-npm run reduce -- -i files/source/puma-catalog.xml -o files/filtered/puma-test.xml -p test
+npm run reduce -- -i ./catalog.xml -o ./catalog-reduced.xml -c ./configs/catalog-reducer.json
+```
+
+Quick local validation run:
+
+```bash
+npm run reduce -- -i files/source/puma-catalog.xml -o files/filtered/puma-test.xml -c ./config/test.json
 ```
 
 Puma source-pricebook profile:
 
 ```bash
-npm run reduce -- -i files/source/puma-catalog.xml -o files/filtered/puma-config-check.xml -p puma
+npm run reduce -- -i files/source/puma-catalog.xml -o files/filtered/puma-config-check.xml -c ./config/puma.json
 ```
 
 Benchmark fixture generation:
 
 ```bash
-npm run reduce -- -i files/source/puma-catalog.xml -o files/source/puma-catalog-1000.xml -p fixture1000
+npm run reduce -- -i files/source/puma-catalog.xml -o files/source/puma-catalog-1000.xml -c ./config/fixture1000.json
 ```
 
 Repeatable benchmarks:
 
 ```bash
-npm run benchmark -- -p benchmark1000-legacy -i files/source/puma-catalog-1000.xml -o files/filtered/benchmark-legacy.xml -w 1 -r 5
-npm run benchmark -- -p benchmark1000 -i files/source/puma-catalog-1000.xml -o files/filtered/benchmark-single-pass.xml -w 1 -r 5
+node scripts/benchmark.js -c ./config/benchmark1000-legacy.json -i files/source/puma-catalog-1000.xml -o files/filtered/benchmark-legacy.xml -w 1 -r 5
+node scripts/benchmark.js -c ./config/benchmark1000.json -i files/source/puma-catalog-1000.xml -o files/filtered/benchmark-single-pass.xml -w 1 -r 5
 ```
 
 ## Validation
@@ -102,24 +122,28 @@ npm run benchmark -- -p benchmark1000 -i files/source/puma-catalog-1000.xml -o f
 Run the core checks from the repository root:
 
 ```bash
+npm run build
 npm test
 npm run lint
 npm run test:coverage
-npm run validate:output
+node scripts/validate-output-integrity.js -s files/source/puma-catalog.xml -c files/filtered/puma-test-quality.xml -i files/filtered/puma-test-quality-inventory.xml -p files/filtered/puma-test-quality-pricebook.xml
 ```
 
-The reducer validates generated XML against the bundled schemas in `tmp/xsd/`.
+The reducer validates generated XML against the bundled schemas in `xsd/`.
 
 ## Repository Layout
 
-- `tmp/reducer.js`: CLI entry point
-- `tmp/lib/`: parser, filter pipeline, XML generation, and validation helpers
-- `tmp/config/`: reducer profiles and benchmark configs
-- `tmp/files/source/`: source XML inputs
-- `tmp/files/filtered/`: generated sample outputs
-- `tmp/test/`: test coverage for parser, filters, selectors, and XML validation
-- `tmp/scripts/`: benchmarks and output-integrity checks
-- `tmp/xsd/`: XML schemas
+- `bin/`: root oclif entrypoints for development and built execution
+- `src/commands/catalog/reduce.ts`: root oclif command wrapper for the reducer
+- `src/lib/`: root command helpers
+- `reducer.js`: CLI entry point
+- `lib/`: parser, filter pipeline, XML generation, and validation helpers
+- `config/`: repository-local profiles and benchmark configs
+- `files/source/`: repository-local source XML inputs
+- `files/filtered/`: repository-local generated sample outputs
+- `test/`: test coverage for parser, filters, selectors, and XML validation
+- `scripts/`: benchmarks and output-integrity checks
+- `xsd/`: XML schemas
 
 ## Notes
 
@@ -127,3 +151,6 @@ The reducer validates generated XML against the bundled schemas in `tmp/xsd/`.
 - The parser expects `<catalog ...>` near the file header and falls back to scanning the full file when needed.
 - Set `pricebookRandomSeed` to make generated pricebook values deterministic.
 - Set `singlePass: true` to enable the single-pass selector on compatible profiles.
+- The root `catalog reduce` command is a thin oclif wrapper around the reducer runtime.
+- The published package does not include the repository-local `config/`, `files/`, `tmp/`, `scripts/`, or `test/` directories.
+- The legacy `--project` / `-p` profile flag has been removed. Use `--config /path/to/file.json`.
