@@ -5,6 +5,7 @@ const path = require('node:path');
 const os = require('node:os');
 
 const parser = require('../lib/parser');
+const { createSilentRuntime } = require('../lib/runtimeSupport');
 
 const baseConfig = {
     total: 0,
@@ -102,6 +103,30 @@ const buildSourcePricebookXml = ({ pricebookId, entries }) => {
         + '    </header>\n'
         + `    <price-tables>${priceTableXml}</price-tables>\n`
         + '  </pricebook>\n'
+        + '</pricebooks>\n';
+};
+
+const buildSourcePricebooksXml = pricebooks => {
+    const pricebookXml = pricebooks.map(({ pricebookId, entries }) => {
+        const priceTableXml = entries
+            .map(({ productId, amount }) => {
+                return `<price-table product-id="${productId}"><amount quantity="1">${amount}</amount></price-table>`;
+            })
+            .join('');
+
+        return '  <pricebook>\n'
+            + `    <header pricebook-id="${pricebookId}">\n`
+            + '      <currency>EUR</currency>\n'
+            + `      <display-name>${pricebookId}</display-name>\n`
+            + '      <online-flag>true</online-flag>\n'
+            + '    </header>\n'
+            + `    <price-tables>${priceTableXml}</price-tables>\n`
+            + '  </pricebook>';
+    }).join('\n');
+
+    return `<?xml version="1.0" encoding="UTF-8"?>\n`
+        + '<pricebooks xmlns="http://www.demandware.com/xml/impex/pricebook/2006-10-31">\n'
+        + `${pricebookXml}\n`
         + '</pricebooks>\n';
 };
 
@@ -322,6 +347,51 @@ test('parse filters configured source pricebooks by selected products', async t 
     assert.doesNotMatch(salePricebookOutput, /catalog-reducer-pricebook/i);
 });
 
+test('parse preserves multiple source pricebooks from a single source file', async t => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'catalog-reducer-parser-'));
+    t.after(async () => {
+        await fs.rm(tempDir, { recursive: true, force: true });
+    });
+
+    const inputFilename = path.join(tempDir, 'multi-source-pricebook-input.xml');
+    const outputFilename = path.join(tempDir, 'multi-source-pricebook-output.xml');
+    const sourcePricebookFilename = path.join(tempDir, 'combined-pricebooks.xml');
+
+    await fs.writeFile(inputFilename, buildCatalogXml(), 'utf8');
+    await fs.writeFile(sourcePricebookFilename, buildSourcePricebooksXml([
+        {
+            pricebookId: 'list-prices',
+            entries: [
+                { productId: 'TEST-PRODUCT', amount: '79.99' },
+                { productId: 'OTHER-PRODUCT', amount: '999.99' }
+            ]
+        },
+        {
+            pricebookId: 'sale-prices',
+            entries: [
+                { productId: 'TEST-PRODUCT', amount: '49.99' },
+                { productId: 'OTHER-PRODUCT', amount: '399.99' }
+            ]
+        }
+    ]), 'utf8');
+
+    await parser.parse(inputFilename, outputFilename, {
+        ...baseConfig,
+        total: 1,
+        pricebookSourceFiles: [sourcePricebookFilename]
+    }, createSilentRuntime());
+
+    const sourcePricebookOutput = await fs.readFile(
+        path.join(tempDir, 'multi-source-pricebook-output-combined-pricebooks.xml'),
+        'utf8'
+    );
+
+    assert.match(sourcePricebookOutput, /pricebook-id="list-prices"/i);
+    assert.match(sourcePricebookOutput, /pricebook-id="sale-prices"/i);
+    assert.match(sourcePricebookOutput, /product-id="TEST-PRODUCT"/i);
+    assert.doesNotMatch(sourcePricebookOutput, /product-id="OTHER-PRODUCT"/i);
+});
+
 test('parse rejects when configured source pricebook file is missing', async t => {
     const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'catalog-reducer-parser-'));
     t.after(async () => {
@@ -464,4 +534,38 @@ test('parse keeps formatted output by default when beautify is not set', async t
     const catalogOutput = await fs.readFile(outputFilename, 'utf8');
 
     assert.match(catalogOutput, /<catalog\b[^>]*>\s*\n\s+<product\b/i);
+});
+
+test('parse can run with a silent runtime without console side effects', async t => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'catalog-reducer-parser-'));
+    const originalInfo = console.info;
+    const originalWarn = console.warn;
+    const infoCalls = [];
+    const warnCalls = [];
+
+    console.info = (...args) => {
+        infoCalls.push(args);
+    };
+
+    console.warn = (...args) => {
+        warnCalls.push(args);
+    };
+
+    t.after(async () => {
+        console.info = originalInfo;
+        console.warn = originalWarn;
+        await fs.rm(tempDir, { recursive: true, force: true });
+    });
+
+    const inputFilename = path.join(tempDir, 'silent-runtime-input.xml');
+    const outputFilename = path.join(tempDir, 'silent-runtime-output.xml');
+    await fs.writeFile(inputFilename, buildCatalogXml(), 'utf8');
+
+    await parser.parse(inputFilename, outputFilename, { ...baseConfig, total: 1 }, createSilentRuntime());
+
+    assert.equal(infoCalls.length, 0);
+    assert.equal(warnCalls.length, 0);
+    assert.equal(await fileExists(outputFilename), true);
+    assert.equal(await fileExists(path.join(tempDir, 'silent-runtime-output-inventory.xml')), true);
+    assert.equal(await fileExists(path.join(tempDir, 'silent-runtime-output-pricebook.xml')), true);
 });

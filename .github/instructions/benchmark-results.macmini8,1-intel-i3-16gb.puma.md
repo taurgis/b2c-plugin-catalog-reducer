@@ -21,6 +21,7 @@ This file tracks benchmark history for the mandatory full-input benchmark run ag
 
 | Timestamp (UTC) | Commit | Branch | Device ID | Variant | Node.js | npm | Profile | Config File | Warm-up | Measured | Min ms | Max ms | Mean ms | Median p50 ms | P95 ms | Command | Change Note |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | --- | --- |
+| 2026-03-13T14:00:50Z | 32d6b5b | main | macmini8,1-intel-i3-16gb | node-expat | v22.21.1 | 11.6.2 | benchmark1000 | `config/benchmark1000.json` | 1 | 5 | 106119.05 | 124275.51 | 112060.80 | 109924.32 | 124285.62 | `node scripts/benchmark.js -c config/benchmark1000.json -i files/source/puma-catalog.xml -o files/filtered/puma-bench-full-nodeexpat.xml -w 1 -r 5` | Streamed compact source-pricebook writes and introduced injectable silent runtime logging/progress so benchmark runs measure parser work without reducer noise. |
 | 2026-03-13T13:24:22Z | dcb3fde | main | macmini8,1-intel-i3-16gb | node-expat | v22.21.1 | 11.6.2 | benchmark1000 | `config/benchmark1000.json` | 1 | 5 | 117295.93 | 137979.66 | 127500.76 | 128043.71 | 138110.04 | `node scripts/benchmark.js -c config/benchmark1000.json -i files/source/puma-catalog.xml -o files/filtered/puma-bench-full-nodeexpat.xml -w 1 -r 5` | Fixed the preferred-pass filler-capture runtime-state bug and added regression coverage for the no-standalone-filler path. |
 | 2026-03-13T12:39:46Z | fd793c3 | main | macmini8,1-intel-i3-16gb | node-expat | v22.21.1 | 11.6.2 | benchmark1000 | `config/benchmark1000.json` | 1 | 5 | 114235.00 | 161297.14 | 142587.42 | 145760.45 | 161329.71 | `node scripts/benchmark.js -c config/benchmark1000.json -i files/source/puma-catalog.xml -o files/filtered/puma-bench-full-nodeexpat.xml -w 1 -r 5` | Extracted selection planning/execution out of `parser.js`, removed duplicated selection-config guards, and replaced filler filter class-name coupling with an explicit filter contract. |
 | 2026-03-13T11:43:06Z | fabbb04 | main | macmini8,1-intel-i3-16gb | node-expat | v22.21.1 | 11.6.2 | benchmark1000 | `config/benchmark1000.json` | 1 | 5 | 107144.51 | 166133.56 | 128923.72 | 119789.32 | 166161.55 | `node scripts/benchmark.js -c config/benchmark1000.json -i files/source/puma-catalog.xml -o files/filtered/puma-bench-full-nodeexpat.xml -w 1 -r 5` | Removed single-pass selector support, standardized all configs on multi-pass filtering, and simplified benchmarking to one canonical benchmark. Baseline reset: `benchmark1000` now measures multi-pass only. |
@@ -41,6 +42,7 @@ Scale: each `#` is about 10,000 ms of mean runtime.
 Baseline reset note: the 2026-03-13T11:43:06Z `benchmark1000` entry is the new canonical multi-pass-only benchmark after single-pass selector removal. Earlier `benchmark1000` entries below are historical single-pass data and are not directly comparable.
 
 ### benchmark1000 (current multi-pass only)
+- 2026-03-13T14:00:50Z | 112060.80 ms | ###########
 - 2026-03-13T13:24:22Z | 127500.76 ms | #############
 - 2026-03-13T12:39:46Z | 142587.42 ms | ##############
 - 2026-03-13T11:43:06Z | 128923.72 ms | #############

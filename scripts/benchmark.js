@@ -9,6 +9,7 @@ const { hideBin } = require('yargs/helpers');
 
 const { loadConfigFile } = require('../lib/selectorConfig');
 const parser = require('../lib/parser');
+const { createSilentRuntime } = require('../lib/runtimeSupport');
 const { deriveOutputFilename, derivePricebookOutputFilenames } = require('../lib/xmlSchemaValidator');
 
 const resolveCliPath = inputPath => path.resolve(process.cwd(), inputPath);
@@ -80,7 +81,7 @@ async function main() {
         const runOutputFilename = deriveBenchmarkOutputFilename(outputFilename, runIndex);
         const begin = process.hrtime.bigint();
 
-        await parser.parse(inputFilename, runOutputFilename, selectorConfig);
+        await parser.parse(inputFilename, runOutputFilename, selectorConfig, createSilentRuntime());
 
         const elapsedNanoseconds = process.hrtime.bigint() - begin;
         await removeOutputTriplet(runOutputFilename, selectorConfig);
