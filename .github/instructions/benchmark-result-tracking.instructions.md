@@ -30,18 +30,17 @@ applyTo: '**'
 - Build a stable `device-id` and use it in the filename pattern `benchmark-results.<device-id>.puma.md`.
 - Example filename: `.github/instructions/benchmark-results.macmini8,1-intel-i3-16gb.puma.md`
 
-## Required Benchmark Commands
-- Legacy selector mode:
-  - `node scripts/benchmark.js -c config/benchmark1000-legacy.json -i files/source/puma-catalog.xml -o files/filtered/puma-bench-full-legacy-nodeexpat.xml -w 1 -r 5`
-- Single-pass selector mode:
-  - `node scripts/benchmark.js -c config/benchmark1000.json -i files/source/puma-catalog.xml -o files/filtered/puma-bench-full-single-nodeexpat.xml -w 1 -r 5`
+## Required Benchmark Command
+- Canonical multi-pass benchmark:
+  - `node scripts/benchmark.js -c config/benchmark1000.json -i files/source/puma-catalog.xml -o files/filtered/puma-bench-full-nodeexpat.xml -w 1 -r 5`
 
 ## Required Tracking File Update
-- Append a new entry to `.github/instructions/benchmark-results.<device-id>.puma.md` for each profile run.
+- Append a new entry to `.github/instructions/benchmark-results.<device-id>.puma.md` for each benchmark run.
 - Include all of the following fields:
   - UTC timestamp
   - git commit and branch
   - device ID (linked to a device profile entry with full specs)
+  - profile name (use `benchmark1000`)
   - implementation variant (use `node-expat`)
   - Node.js version and npm version
   - config file path
@@ -58,3 +57,4 @@ applyTo: '**'
 - If a benchmark-required change cannot complete a full run, still update `.github/instructions/benchmark-results.<device-id>.puma.md` with a skipped entry and a clear reason.
 - If a run is intentionally interrupted after partial measured runs, record the partial sample count and mark the entry as `partial` in the change note.
 - Never record results in a file belonging to a different machine.
+- When the benchmark contract changes materially (for example, removing a selector mode), record a clear baseline reset note in the active machine history file.

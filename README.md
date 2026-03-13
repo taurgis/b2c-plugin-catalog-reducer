@@ -79,8 +79,7 @@ Config files can live anywhere. The example below works as a standalone JSON con
 		]
 	},
 	"pricebookRandomSeed": null,
-	"pricebookSourceFiles": [],
-	"singlePass": false
+	"pricebookSourceFiles": []
 }
 ```
 
@@ -113,8 +112,7 @@ npm run reduce -- -i files/source/puma-catalog.xml -o files/source/puma-catalog-
 Repeatable benchmarks:
 
 ```bash
-node scripts/benchmark.js -c ./config/benchmark1000-legacy.json -i files/source/puma-catalog-1000.xml -o files/filtered/benchmark-legacy.xml -w 1 -r 5
-node scripts/benchmark.js -c ./config/benchmark1000.json -i files/source/puma-catalog-1000.xml -o files/filtered/benchmark-single-pass.xml -w 1 -r 5
+node scripts/benchmark.js -c ./config/benchmark1000.json -i files/source/puma-catalog-1000.xml -o files/filtered/benchmark.xml -w 1 -r 5
 ```
 
 ## Validation
@@ -150,7 +148,7 @@ The reducer validates generated XML against the bundled schemas in `xsd/`.
 - The reducer validates generated files after writing them.
 - The parser expects `<catalog ...>` near the file header and falls back to scanning the full file when needed.
 - Set `pricebookRandomSeed` to make generated pricebook values deterministic.
-- Set `singlePass: true` to enable the single-pass selector on compatible profiles.
+- The deprecated `singlePass` config field is ignored; all profiles use the multi-pass selector pipeline.
 - The root `catalog reduce` command is a thin oclif wrapper around the reducer runtime.
 - The published package does not include the repository-local `config/`, `files/`, `tmp/`, `scripts/`, or `test/` directories.
 - The legacy `--project` / `-p` profile flag has been removed. Use `--config /path/to/file.json`.

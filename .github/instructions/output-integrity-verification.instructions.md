@@ -11,7 +11,7 @@ applyTo: '**'
 
 ## Required Verification Commands
 1. Generate filtered outputs from the canonical full input:
-   - `node reducer.js -i files/source/puma-catalog.xml -o files/filtered/puma-test-quality.xml -p test`
+   - `node reducer.js -i files/source/puma-catalog.xml -o files/filtered/puma-test-quality.xml -c config/test.json`
 2. Validate source/output integrity relationships:
    - `node <<'NODE'`
    - `const fs = require('fs');`

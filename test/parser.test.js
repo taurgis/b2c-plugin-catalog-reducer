@@ -382,9 +382,17 @@ test('parse removes stale combined pricebook output when source pricebook files 
     assert.equal(await fileExists(staleCombinedPricebookFilename), false);
 });
 
-test('parse writes expected outputs in single-pass mode', async t => {
+test('parse ignores deprecated singlePass config and writes expected outputs', async t => {
     const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'catalog-reducer-parser-'));
+    const warnings = [];
+    const originalEmitWarning = process.emitWarning;
+
+    process.emitWarning = (...args) => {
+        warnings.push(args);
+    };
+
     t.after(async () => {
+        process.emitWarning = originalEmitWarning;
         await fs.rm(tempDir, { recursive: true, force: true });
     });
 
@@ -404,6 +412,8 @@ test('parse writes expected outputs in single-pass mode', async t => {
 
     const catalogOutput = await fs.readFile(outputFilename, 'utf8');
 
+    assert.equal(warnings.length, 1);
+    assert.match(String(warnings[0][0]), /singlePass/i);
     assert.match(catalogOutput, /catalog-id="test-catalog"/i);
     assert.match(catalogOutput, /<product\s+product-id="TEST-PRODUCT"/i);
 });
