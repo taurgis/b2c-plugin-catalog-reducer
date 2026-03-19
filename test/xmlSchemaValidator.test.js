@@ -3,8 +3,6 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const os = require('node:os');
-const { execFile } = require('node:child_process');
-const { promisify } = require('node:util');
 
 const {
     validateGeneratedOutputs,
@@ -12,8 +10,6 @@ const {
     derivePricebookOutputFilenames,
     deriveStorefrontOutputFilenames
 } = require('../lib/xmlSchemaValidator');
-
-const execFileAsync = promisify(execFile);
 
 const makeSchema = (targetNamespace, rootElementName) => `
 <?xml version="1.0" encoding="UTF-8"?>
@@ -34,21 +30,7 @@ const makeSchema = (targetNamespace, rootElementName) => `
 
 const makeXml = (targetNamespace, rootElementName) => `<?xml version="1.0" encoding="UTF-8"?>\n<${rootElementName} xmlns="${targetNamespace}"/>\n`;
 
-const canRunXmllint = async () => {
-    try {
-        await execFileAsync('xmllint', ['--version']);
-        return true;
-    } catch (error) {
-        return false;
-    }
-};
-
 test('validateGeneratedOutputs validates catalog, inventory and pricebook XML files', async t => {
-    if (!(await canRunXmllint())) {
-        t.skip('xmllint is required for XML schema validation tests');
-        return;
-    }
-
     const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'catalog-reducer-xsd-validator-'));
     t.after(async () => {
         await fs.rm(tempDir, { recursive: true, force: true });
@@ -72,11 +54,6 @@ test('validateGeneratedOutputs validates catalog, inventory and pricebook XML fi
 });
 
 test('validateGeneratedOutputs rejects when an output XML does not match its schema', async t => {
-    if (!(await canRunXmllint())) {
-        t.skip('xmllint is required for XML schema validation tests');
-        return;
-    }
-
     const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'catalog-reducer-xsd-validator-'));
     t.after(async () => {
         await fs.rm(tempDir, { recursive: true, force: true });
@@ -103,11 +80,6 @@ test('validateGeneratedOutputs rejects when an output XML does not match its sch
 });
 
 test('validateGeneratedOutputs validates one output pricebook file per configured source file', async t => {
-    if (!(await canRunXmllint())) {
-        t.skip('xmllint is required for XML schema validation tests');
-        return;
-    }
-
     const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'catalog-reducer-xsd-validator-'));
     t.after(async () => {
         await fs.rm(tempDir, { recursive: true, force: true });
@@ -136,11 +108,6 @@ test('validateGeneratedOutputs validates one output pricebook file per configure
 });
 
 test('validateGeneratedOutputs validates one output storefront catalog file per configured source file', async t => {
-    if (!(await canRunXmllint())) {
-        t.skip('xmllint is required for XML schema validation tests');
-        return;
-    }
-
     const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'catalog-reducer-xsd-validator-'));
     t.after(async () => {
         await fs.rm(tempDir, { recursive: true, force: true });

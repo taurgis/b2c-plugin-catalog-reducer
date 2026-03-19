@@ -29,7 +29,7 @@ Official plugin lifecycle commands are documented in the Salesforce B2C Develope
 
 System requirements:
 
-- `xmllint` must be available on `PATH` for XML schema validation
+- No external XML validator is required. XSD validation runs through the bundled `xmllint-wasm` dependency.
 
 ## Repository Setup
 
@@ -122,7 +122,7 @@ b2c plugins link /absolute/path/to/b2c-plugin-catalog-reducer
 
 If you changed TypeScript sources locally, re-run `npm run build` before testing in `b2c` so the CLI loads the latest files from `dist/`.
 
-If XML validation fails at runtime, verify that `xmllint` is installed and available on `PATH`.
+If XML validation fails at runtime, inspect the reported schema error details for the failing output file. A system `xmllint` install is not required for validation.
 
 ## Repository-Local Usage
 

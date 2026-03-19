@@ -41,7 +41,7 @@ applyTo: '**'
 - Formatting-only differences (whitespace, line wrapping, attribute order) are explicitly non-failures.
 - Equivalent parser wrapper or container-flattening differences are explicitly non-failures when the underlying values are preserved.
 - The 5 sampled IDs and per-ID outcome must be documented in the change summary.
-- XSD validation must pass for generated files (the reducer command enforces this via `xmllint`).
+- XSD validation must pass for generated files (the reducer command enforces this via in-process schema validation).
 
 ## Failure Handling
 - Treat any failed assertion as a blocking issue.

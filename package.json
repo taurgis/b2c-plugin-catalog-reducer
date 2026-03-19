@@ -36,6 +36,7 @@
     "node-expat": "^2.4.1",
     "xml-flow": "^1.0.4",
     "xml-formatter": "^2.6.1",
+    "xmllint-wasm": "^5.1.0",
     "yargs": "^17.7.2"
   },
   "devDependencies": {
