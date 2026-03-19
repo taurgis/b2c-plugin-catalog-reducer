@@ -15,19 +15,115 @@ Repository-local fixtures and sample profiles under `files/` and `config/` are f
 - Validates generated XML against the bundled catalog, inventory, and pricebook schemas
 - Includes repeatable benchmark and output-integrity tooling
 
-## Install
+## Prerequisites
+
+Install the Salesforce B2C CLI first if you want to run this reducer as a B2C CLI plugin:
 
 ```bash
-npm install
+npm install -g @salesforce/b2c-cli
+b2c --version
 ```
+
+Official plugin lifecycle commands are documented in the Salesforce B2C Developer Tooling guides for [extending the B2C CLI](https://salesforcecommercecloud.github.io/b2c-developer-tooling/guide/extending.html) and [third-party plugins](https://salesforcecommercecloud.github.io/b2c-developer-tooling/guide/third-party-plugins.html).
 
 System requirements:
 
 - `xmllint` must be available on `PATH` for XML schema validation
 
-`npm install` bootstraps both the root CLI and the reducer runtime dependencies.
+## Repository Setup
 
-## Usage
+```bash
+npm install
+```
+
+- `npm install` bootstraps both the root CLI and the reducer runtime dependencies.
+
+## Use In B2C CLI
+
+This package exposes `catalog reduce` as an oclif command, so once the plugin is linked or installed in `b2c`, the reducer runs as:
+
+```bash
+b2c catalog reduce -i ./catalog.xml -o ./catalog-reduced.xml -c ./catalog-reducer.json
+```
+
+### Link A Local Checkout
+
+Use this flow while developing in this repository or before publishing the package to npm:
+
+```bash
+npm install
+npm run build
+b2c plugins link /absolute/path/to/b2c-plugin-catalog-reducer
+b2c plugins
+b2c help catalog reduce
+```
+
+Re-run `npm run build` after TypeScript changes so `b2c` loads the latest files from `dist/`.
+
+To remove the linked plugin:
+
+```bash
+b2c plugins unlink b2c-plugin-catalog-reducer
+```
+
+### Install A Published Package
+
+If this package is published to npm, install it into `b2c` with the package name:
+
+```bash
+b2c plugins install b2c-plugin-catalog-reducer
+b2c plugins
+b2c help catalog reduce
+```
+
+To uninstall the published plugin:
+
+```bash
+b2c plugins uninstall b2c-plugin-catalog-reducer
+```
+
+### Run The Reducer Through B2C CLI
+
+```bash
+b2c catalog reduce -i ./catalog.xml -o ./catalog-reduced.xml -c ./catalog-reducer.json
+```
+
+Arguments:
+
+- `-c`, `--config`: path to a JSON config file anywhere on disk
+- `-i`, `--input`: source catalog XML file
+- `-o`, `--output`: reduced catalog output file
+
+Relative input and output paths are resolved from the directory where you invoke `b2c`.
+
+When `--config` is used, relative paths inside `pricebookSourceFiles` are resolved from the config file location.
+
+If `--config` is omitted, the built-in default reducer config is used.
+
+The published package does not include the repository-local `config/`, `files/`, `tmp/`, `scripts/`, or `test/` directories. Provide your own catalog XML input and config file when you run the plugin from an installed package.
+
+### Troubleshooting
+
+If `b2c catalog reduce` is not available after linking or installing the plugin:
+
+```bash
+b2c plugins
+b2c help catalog reduce
+```
+
+If the command is still missing for a local checkout, rebuild the plugin and link it again:
+
+```bash
+npm install
+npm run build
+b2c plugins link /absolute/path/to/b2c-plugin-catalog-reducer
+```
+
+If you changed TypeScript sources locally, re-run `npm run build` before testing in `b2c` so the CLI loads the latest files from `dist/`.
+
+If XML validation fails at runtime, verify that `xmllint` is installed and available on `PATH`.
+
+## Repository-Local Usage
 
 Run the reducer from the repository root:
 
@@ -41,17 +137,7 @@ Direct oclif command:
 ./bin/dev.js catalog reduce -i ./catalog.xml -o ./catalog-reduced.xml -c ./catalog-reducer.json
 ```
 
-Arguments:
-
-- `-c`, `--config`: path to a JSON config file anywhere on disk
-- `-i`, `--input`: source catalog XML file
-- `-o`, `--output`: reduced catalog output file
-
-Relative input and output paths are resolved from the directory where you invoke the CLI.
-
-When `--config` is used, relative paths inside `pricebookSourceFiles` are resolved from the config file location.
-
-If `--config` is omitted, the built-in default reducer config is used.
+The repository-local wrappers run the same reducer workflow as `b2c catalog reduce`.
 
 ## Outputs
 
