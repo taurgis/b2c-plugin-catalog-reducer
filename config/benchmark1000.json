@@ -1,0 +1,10 @@
+{
+  "total": 20,
+  "master": 5,
+  "productIds": [],
+  "attributes": {
+    "custom": []
+  },
+  "beautify": true,
+  "pricebookRandomSeed": 1337
+}

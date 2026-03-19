@@ -73,7 +73,8 @@ test('CLI accepts an explicit config file path outside config/', async t => {
             custom: []
         },
         pricebookRandomSeed: 1337,
-        pricebookSourceFiles: []
+        pricebookSourceFiles: [],
+        storefrontSourceFiles: []
     }, null, 2), 'utf8');
 
     await execFileAsync(process.execPath, [

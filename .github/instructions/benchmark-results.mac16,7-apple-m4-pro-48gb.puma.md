@@ -7,8 +7,8 @@ This file tracks benchmark history for the mandatory full-input benchmark run ag
 - Implementation variant: `node-expat`
 - Warm-up runs: `1`
 - Measured runs: `5` target (or explicitly logged partial when interrupted)
-- Node.js: `v22.22.0`
-- npm: `10.9.4`
+- Node.js: `v24.14.0`
+- npm: `11.9.0`
 - Baseline reset reason: first per-system benchmark tracking entry for this machine
 
 ## Device Profile
@@ -41,6 +41,7 @@ This file tracks benchmark history for the mandatory full-input benchmark run ag
 | 2026-03-09T10:41:29Z | 0c1b4d4 | master | mac16,7-apple-m4-pro-48gb | node-expat | v22.22.0 | 10.9.4 | benchmark1000 | `config/benchmark1000.json` | 1 | 5 | 30258.62 | 32624.77 | 31021.79 | 30819.75 | 32631.69 | `npm run benchmark -- -p benchmark1000 -i files/source/puma-catalog.xml -o files/filtered/puma-bench-full-single-nodeexpat.xml -w 1 -r 5` | Changed source-pricebook mode to emit one filtered output file per source pricebook, using suffixed filenames and cleaning up stale combined `-pricebook` outputs |
 | 2026-03-09T11:02:11Z | 0c1b4d4 | master | mac16,7-apple-m4-pro-48gb | node-expat | v22.22.0 | 10.9.4 | benchmark1000-legacy | `config/benchmark1000-legacy.json` | 1 | 5 | 29771.79 | 30329.02 | 29950.69 | 29846.67 | 30333.21 | `npm run benchmark -- -p benchmark1000-legacy -i files/source/puma-catalog.xml -o files/filtered/puma-bench-full-legacy-nodeexpat.xml -w 1 -r 5` | Reran the dedicated Puma profile with `beautify: true`; confirmed formatted catalog, inventory, and split pricebook outputs are generated successfully |
 | 2026-03-09T11:02:11Z | 0c1b4d4 | master | mac16,7-apple-m4-pro-48gb | node-expat | v22.22.0 | 10.9.4 | benchmark1000 | `config/benchmark1000.json` | 1 | 5 | 30292.88 | 31031.13 | 30494.95 | 30349.98 | 31037.85 | `npm run benchmark -- -p benchmark1000 -i files/source/puma-catalog.xml -o files/filtered/puma-bench-full-single-nodeexpat.xml -w 1 -r 5` | Reran the dedicated Puma profile with `beautify: true`; confirmed formatted catalog, inventory, and split pricebook outputs are generated successfully |
+| 2026-03-19T14:36:48Z | a9031d6 | main | mac16,7-apple-m4-pro-48gb | node-expat | v24.14.0 | 11.9.0 | benchmark1000 | `config/benchmark1000.json` | 1 | 5 | 30184.01 | 30595.41 | 30437.07 | 30517.76 | 30601.64 | `node scripts/benchmark.js -c config/benchmark1000.json -i files/source/puma-catalog.xml -o files/filtered/puma-bench-full-nodeexpat.xml -w 1 -r 5` | Added `storefrontSourceFiles` support, preserved storefront category structure while filtering assignments by selected product IDs, and normalized invalid Puma storefront surrogate references for XSD-valid output |
 
 ## ASCII Trend (Mean ms, lower is better)
 
@@ -69,6 +70,7 @@ Scale: each `#` is about 10,000 ms of mean runtime.
 - 2026-03-09T10:25:44Z | 30412.07 ms | ###
 - 2026-03-09T10:41:29Z | 31021.79 ms | ###
 - 2026-03-09T11:02:11Z | 30494.95 ms | ###
+- 2026-03-19T14:36:48Z | 30437.07 ms | ###
 
 ## Update Template
 

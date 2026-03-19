@@ -52,4 +52,6 @@ Thumbs.db
 
 /tmp
 /files
-/config
+/config/*
+!/config/default.json
+!/config/benchmark1000.json

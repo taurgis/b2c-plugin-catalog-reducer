@@ -6,7 +6,12 @@ const os = require('node:os');
 const { execFile } = require('node:child_process');
 const { promisify } = require('node:util');
 
-const { validateGeneratedOutputs, deriveOutputFilename, derivePricebookOutputFilenames } = require('../lib/xmlSchemaValidator');
+const {
+    validateGeneratedOutputs,
+    deriveOutputFilename,
+    derivePricebookOutputFilenames,
+    deriveStorefrontOutputFilenames
+} = require('../lib/xmlSchemaValidator');
 
 const execFileAsync = promisify(execFile);
 
@@ -125,6 +130,41 @@ test('validateGeneratedOutputs validates one output pricebook file per configure
     await fs.writeFile(inventoryFilename, makeXml('urn:test:inventory', 'inventory'), 'utf8');
     await Promise.all(pricebookFilenames.map(pricebookFilename => {
         return fs.writeFile(pricebookFilename, makeXml('urn:test:pricebook', 'pricebooks'), 'utf8');
+    }));
+
+    await assert.doesNotReject(() => validateGeneratedOutputs(outputFilename, xsdDir, selectorConfig));
+});
+
+test('validateGeneratedOutputs validates one output storefront catalog file per configured source file', async t => {
+    if (!(await canRunXmllint())) {
+        t.skip('xmllint is required for XML schema validation tests');
+        return;
+    }
+
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'catalog-reducer-xsd-validator-'));
+    t.after(async () => {
+        await fs.rm(tempDir, { recursive: true, force: true });
+    });
+
+    const xsdDir = path.join(tempDir, 'xsd');
+    const outputFilename = path.join(tempDir, 'output.xml');
+    const inventoryFilename = deriveOutputFilename(outputFilename, '-inventory');
+    const pricebookFilename = deriveOutputFilename(outputFilename, '-pricebook');
+    const selectorConfig = {
+        storefrontSourceFiles: ['files/source/storefront-a.xml', 'files/source/storefront-b.xml']
+    };
+    const storefrontFilenames = deriveStorefrontOutputFilenames(outputFilename, selectorConfig);
+
+    await fs.mkdir(xsdDir, { recursive: true });
+    await fs.writeFile(path.join(xsdDir, 'catalog.xsd'), makeSchema('urn:test:catalog', 'catalog'), 'utf8');
+    await fs.writeFile(path.join(xsdDir, 'inventory.xsd'), makeSchema('urn:test:inventory', 'inventory'), 'utf8');
+    await fs.writeFile(path.join(xsdDir, 'pricebook.xsd'), makeSchema('urn:test:pricebook', 'pricebooks'), 'utf8');
+
+    await fs.writeFile(outputFilename, makeXml('urn:test:catalog', 'catalog'), 'utf8');
+    await fs.writeFile(inventoryFilename, makeXml('urn:test:inventory', 'inventory'), 'utf8');
+    await fs.writeFile(pricebookFilename, makeXml('urn:test:pricebook', 'pricebooks'), 'utf8');
+    await Promise.all(storefrontFilenames.map(storefrontFilename => {
+        return fs.writeFile(storefrontFilename, makeXml('urn:test:catalog', 'catalog'), 'utf8');
     }));
 
     await assert.doesNotReject(() => validateGeneratedOutputs(outputFilename, xsdDir, selectorConfig));

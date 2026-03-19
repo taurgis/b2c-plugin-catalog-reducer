@@ -16,7 +16,8 @@ const baseConfig = {
     },
     beautify: false,
     pricebookRandomSeed: null,
-    pricebookSourceFiles: []
+    pricebookSourceFiles: [],
+    storefrontSourceFiles: []
 };
 
 const buildCatalogXml = ({ includeCatalogId = true, leadingCommentLines = 0 } = {}) => {
@@ -129,6 +130,35 @@ const buildSourcePricebooksXml = pricebooks => {
         + `${pricebookXml}\n`
         + '</pricebooks>\n';
 };
+
+    const buildStorefrontCatalogXml = () => {
+        return `<?xml version="1.0" encoding="UTF-8"?>\n`
+        + '<catalog xmlns="http://www.demandware.com/xml/impex/catalog/2006-10-31" catalog-id="storefront-catalog">\n'
+        + '  <header>\n'
+        + '    <image-settings/>\n'
+        + '  </header>\n'
+        + '  <category category-id="root"/>\n'
+        + '  <category category-id="child">\n'
+        + '    <parent>root</parent>\n'
+        + '  </category>\n'
+        + '  <category-assignment category-id="root" product-id="TEST-PRODUCT">\n'
+        + '    <primary-flag>true</primary-flag>\n'
+        + '  </category-assignment>\n'
+        + '  <category-assignment category-id="child" product-id="OTHER-PRODUCT"/>\n'
+        + '</catalog>\n';
+    };
+
+    const buildStorefrontCatalogXmlWithInvalidCharRefs = () => {
+        return `<?xml version="1.0" encoding="UTF-8"?>\n`
+        + '<catalog xmlns="http://www.demandware.com/xml/impex/catalog/2006-10-31" catalog-id="storefront-catalog">\n'
+        + '  <category category-id="root">\n'
+        + '    <custom-attributes>\n'
+        + '      <custom-attribute attribute-id="seoText" xml:lang="x-default">&#55358;&#56721; Welcome</custom-attribute>\n'
+        + '    </custom-attributes>\n'
+        + '  </category>\n'
+        + '  <category-assignment category-id="root" product-id="TEST-PRODUCT"/>\n'
+        + '</catalog>\n';
+    };
 
 const fileExists = async filePath => {
     try {
@@ -347,6 +377,65 @@ test('parse filters configured source pricebooks by selected products', async t 
     assert.doesNotMatch(salePricebookOutput, /catalog-reducer-pricebook/i);
 });
 
+test('parse filters configured source storefront catalogs by selected products while preserving structure', async t => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'catalog-reducer-parser-'));
+    t.after(async () => {
+        await fs.rm(tempDir, { recursive: true, force: true });
+    });
+
+    const inputFilename = path.join(tempDir, 'storefront-input.xml');
+    const outputFilename = path.join(tempDir, 'storefront-output.xml');
+    const storefrontFilename = path.join(tempDir, 'storefront-source.xml');
+
+    await fs.writeFile(inputFilename, buildCatalogXml(), 'utf8');
+    await fs.writeFile(storefrontFilename, buildStorefrontCatalogXml(), 'utf8');
+
+    await parser.parse(inputFilename, outputFilename, {
+        ...baseConfig,
+        total: 1,
+        storefrontSourceFiles: [storefrontFilename]
+    });
+
+    const storefrontOutputFilename = path.join(tempDir, 'storefront-output-storefront-storefront-source.xml');
+    const storefrontOutput = await fs.readFile(storefrontOutputFilename, 'utf8');
+
+    assert.equal(await fileExists(storefrontOutputFilename), true);
+    assert.match(storefrontOutput, /catalog-id="storefront-catalog"/i);
+    assert.match(storefrontOutput, /<category\s+category-id="root"/i);
+    assert.match(storefrontOutput, /<category\s+category-id="child"/i);
+    assert.match(storefrontOutput, /product-id="TEST-PRODUCT"/i);
+    assert.match(storefrontOutput, /<primary-flag>true<\/primary-flag>/i);
+    assert.doesNotMatch(storefrontOutput, /product-id="OTHER-PRODUCT"/i);
+});
+
+test('parse normalizes invalid storefront numeric character references while preserving output', async t => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'catalog-reducer-parser-'));
+    t.after(async () => {
+        await fs.rm(tempDir, { recursive: true, force: true });
+    });
+
+    const inputFilename = path.join(tempDir, 'storefront-sanitized-input.xml');
+    const outputFilename = path.join(tempDir, 'storefront-sanitized-output.xml');
+    const storefrontFilename = path.join(tempDir, 'storefront-invalid-charrefs.xml');
+
+    await fs.writeFile(inputFilename, buildCatalogXml(), 'utf8');
+    await fs.writeFile(storefrontFilename, buildStorefrontCatalogXmlWithInvalidCharRefs(), 'utf8');
+
+    await parser.parse(inputFilename, outputFilename, {
+        ...baseConfig,
+        total: 1,
+        storefrontSourceFiles: [storefrontFilename]
+    });
+
+    const storefrontOutput = await fs.readFile(
+        path.join(tempDir, 'storefront-sanitized-output-storefront-storefront-invalid-charrefs.xml'),
+        'utf8'
+    );
+
+    assert.match(storefrontOutput, /&#x1F991; Welcome/i);
+    assert.doesNotMatch(storefrontOutput, /&#55358;&#56721;/i);
+});
+
 test('parse preserves multiple source pricebooks from a single source file', async t => {
     const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'catalog-reducer-parser-'));
     t.after(async () => {
@@ -409,6 +498,26 @@ test('parse rejects when configured source pricebook file is missing', async t =
             pricebookSourceFiles: [path.join(tempDir, 'missing-pricebook.xml')]
         }),
         /pricebook source file/i
+    );
+});
+
+test('parse rejects when configured source storefront file is missing', async t => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'catalog-reducer-parser-'));
+    t.after(async () => {
+        await fs.rm(tempDir, { recursive: true, force: true });
+    });
+
+    const inputFilename = path.join(tempDir, 'missing-source-storefront-input.xml');
+    const outputFilename = path.join(tempDir, 'missing-source-storefront-output.xml');
+    await fs.writeFile(inputFilename, buildCatalogXml(), 'utf8');
+
+    await assert.rejects(
+        () => parser.parse(inputFilename, outputFilename, {
+            ...baseConfig,
+            total: 1,
+            storefrontSourceFiles: [path.join(tempDir, 'missing-storefront.xml')]
+        }),
+        /storefront source file/i
     );
 });
 

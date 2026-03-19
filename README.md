@@ -11,6 +11,7 @@ Repository-local fixtures and sample profiles under `files/` and `config/` are f
 - Reduces large catalog XML files into smaller fixture datasets
 - Supports preferred product IDs, master-product targets, attribute-driven selection, and filler products
 - Writes catalog, inventory, and pricebook outputs in one run
+- Supports source-derived storefront catalog outputs that preserve category structure while pruning category assignments to selected products
 - Supports generated or source-derived pricebook outputs
 - Validates generated XML against the bundled catalog, inventory, and pricebook schemas
 - Includes repeatable benchmark and output-integrity tooling
@@ -96,7 +97,7 @@ Arguments:
 
 Relative input and output paths are resolved from the directory where you invoke `b2c`.
 
-When `--config` is used, relative paths inside `pricebookSourceFiles` are resolved from the config file location.
+When `--config` is used, relative paths inside `pricebookSourceFiles` and `storefrontSourceFiles` are resolved from the config file location.
 
 If `--config` is omitted, the built-in default reducer config is used.
 
@@ -149,6 +150,8 @@ Each run writes:
 
 When a profile uses `pricebookSourceFiles`, the reducer writes one filtered pricebook file per configured source pricebook instead of a single generated pricebook file.
 
+When a profile uses `storefrontSourceFiles`, the reducer writes one filtered storefront catalog file per configured source storefront. Each storefront output keeps the original catalog structure and removes only `category-assignment` entries for products that were not selected from the main catalog reduction.
+
 ## Example Config
 
 Config files can live anywhere. The example below works as a standalone JSON config file.
@@ -165,7 +168,8 @@ Config files can live anywhere. The example below works as a standalone JSON con
 		]
 	},
 	"pricebookRandomSeed": null,
-	"pricebookSourceFiles": []
+	"pricebookSourceFiles": [],
+	"storefrontSourceFiles": []
 }
 ```
 
