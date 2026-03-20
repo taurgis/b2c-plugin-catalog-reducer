@@ -41,6 +41,26 @@ const buildCatalogXml = ({ includeCatalogId = true, leadingCommentLines = 0 } = 
         + '</catalog>\n';
 };
 
+const buildCatalogXmlWithBundledProducts = () => {
+    return `<?xml version="1.0" encoding="UTF-8"?>\n`
+        + '<catalog xmlns="http://www.demandware.com/xml/impex/catalog/2006-10-31" catalog-id="bundle-catalog">\n'
+        + '  <product product-id="BUNDLE-PRODUCT">\n'
+        + '    <online-flag>true</online-flag>\n'
+        + '    <bundled-products>\n'
+        + '      <bundled-product product-id="BUNDLE-CHILD-1">\n'
+        + '        <quantity>1</quantity>\n'
+        + '      </bundled-product>\n'
+        + '      <bundled-product product-id="BUNDLE-CHILD-2">\n'
+        + '        <quantity>2</quantity>\n'
+        + '      </bundled-product>\n'
+        + '    </bundled-products>\n'
+        + '    <options>\n'
+        + '      <shared-option option-id="consoleWarranty"/>\n'
+        + '    </options>\n'
+        + '  </product>\n'
+        + '</catalog>\n';
+};
+
 const buildMultilineCatalogTagXml = () => {
     return `<?xml version="1.0" encoding="UTF-8"?>\n`
         + '<catalog\n'
@@ -375,6 +395,31 @@ test('parse filters configured source pricebooks by selected products', async t 
     assert.doesNotMatch(salePricebookOutput, /product-id="OTHER-PRODUCT"/i);
     assert.doesNotMatch(listPricebookOutput, /catalog-reducer-pricebook/i);
     assert.doesNotMatch(salePricebookOutput, /catalog-reducer-pricebook/i);
+});
+
+test('parse preserves bundled-products and shared-option markup in reduced catalog output', async t => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'catalog-reducer-parser-'));
+    t.after(async () => {
+        await fs.rm(tempDir, { recursive: true, force: true });
+    });
+
+    const inputFilename = path.join(tempDir, 'bundled-input.xml');
+    const outputFilename = path.join(tempDir, 'bundled-output.xml');
+
+    await fs.writeFile(inputFilename, buildCatalogXmlWithBundledProducts(), 'utf8');
+
+    await parser.parse(inputFilename, outputFilename, {
+        ...baseConfig,
+        total: 1,
+        productIds: ['BUNDLE-PRODUCT']
+    });
+
+    const output = await fs.readFile(outputFilename, 'utf8');
+
+    assert.match(output, /<bundled-products><bundled-product\s+product-id="BUNDLE-CHILD-1"><quantity>1<\/quantity><\/bundled-product><bundled-product\s+product-id="BUNDLE-CHILD-2"><quantity>2<\/quantity><\/bundled-product><\/bundled-products>/i);
+    assert.doesNotMatch(output, /<bundled-products\s+product-id=/i);
+    assert.match(output, /<shared-option\s+option-id="consoleWarranty"\s*\/>/i);
+    assert.doesNotMatch(output, /option-id="\[object Object\]"/i);
 });
 
 test('parse filters configured source storefront catalogs by selected products while preserving structure', async t => {

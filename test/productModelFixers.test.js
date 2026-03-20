@@ -24,6 +24,30 @@ test('fixOptions converts options to shared-option entries', () => {
     });
 });
 
+
+test('fixOptions normalizes parser-shaped shared-option values', () => {
+    const product = {
+        options: {
+            $attrs: {
+                'option-id': 'consoleWarranty'
+            }
+        }
+    };
+    const modifiedProduct = clone(product);
+
+    ProductModelFixers.fixOptions(product, modifiedProduct);
+
+    assert.deepEqual(modifiedProduct.options, {
+        'shared-option': [
+            {
+                $attrs: {
+                    'option-id': 'consoleWarranty'
+                }
+            }
+        ]
+    });
+});
+
 test('fixCustomAttributes wraps custom attributes in custom-attribute key', () => {
     const product = {
         'custom-attributes': {
@@ -89,6 +113,48 @@ test('fixProductSetProducts maps ids to product-set-product objects', () => {
                 $attrs: {
                     'product-id': 'SET-2'
                 }
+            }
+        ]
+    });
+});
+
+
+test('fixBundledProducts wraps bundled entries in bundled-product nodes', () => {
+    const product = {
+        'bundled-products': [
+            {
+                $attrs: {
+                    'product-id': 'BUNDLE-CHILD-1'
+                },
+                quantity: '1'
+            },
+            {
+                $attrs: {
+                    'product-id': 'BUNDLE-CHILD-2'
+                },
+                quantity: {
+                    $text: '2'
+                }
+            }
+        ]
+    };
+    const modifiedProduct = clone(product);
+
+    ProductModelFixers.fixBundledProducts(product, modifiedProduct);
+
+    assert.deepEqual(modifiedProduct['bundled-products'], {
+        'bundled-product': [
+            {
+                $attrs: {
+                    'product-id': 'BUNDLE-CHILD-1'
+                },
+                quantity: '1'
+            },
+            {
+                $attrs: {
+                    'product-id': 'BUNDLE-CHILD-2'
+                },
+                quantity: '2'
             }
         ]
     });
