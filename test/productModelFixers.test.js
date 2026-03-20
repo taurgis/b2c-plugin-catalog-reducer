@@ -73,11 +73,20 @@ test('fixCustomAttributes wraps custom attributes in custom-attribute key', () =
     });
 });
 
-test('fixPageAttributes normalizes page attributes to an array', () => {
+test('fixPageAttributes preserves the page-attributes container and normalizes child arrays', () => {
     const product = {
         'page-attributes': {
-            $attrs: {
-                'attribute-id': 'department'
+            'page-title': {
+                $attrs: {
+                    'xml:lang': 'x-default'
+                },
+                $text: 'Department'
+            },
+            'page-description': {
+                $attrs: {
+                    'xml:lang': 'x-default'
+                },
+                $text: 'Department description'
             }
         }
     };
@@ -85,13 +94,24 @@ test('fixPageAttributes normalizes page attributes to an array', () => {
 
     ProductModelFixers.fixPageAttributes(product, modifiedProduct);
 
-    assert.deepEqual(modifiedProduct['page-attributes'], [
-        {
-            $attrs: {
-                'attribute-id': 'department'
+    assert.deepEqual(modifiedProduct['page-attributes'], {
+        'page-title': [
+            {
+                $attrs: {
+                    'xml:lang': 'x-default'
+                },
+                $text: 'Department'
             }
-        }
-    ]);
+        ],
+        'page-description': [
+            {
+                $attrs: {
+                    'xml:lang': 'x-default'
+                },
+                $text: 'Department description'
+            }
+        ]
+    });
 });
 
 test('fixProductSetProducts maps ids to product-set-product objects', () => {

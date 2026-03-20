@@ -61,6 +61,19 @@ const buildCatalogXmlWithBundledProducts = () => {
         + '</catalog>\n';
 };
 
+const buildCatalogXmlWithPageAttributes = () => {
+    return `<?xml version="1.0" encoding="UTF-8"?>\n`
+        + '<catalog xmlns="http://www.demandware.com/xml/impex/catalog/2006-10-31" catalog-id="page-attributes-catalog">\n'
+        + '  <product product-id="PAGE-ATTR-PRODUCT">\n'
+        + '    <online-flag>true</online-flag>\n'
+        + '    <page-attributes>\n'
+        + '      <page-title xml:lang="x-default">Look of the week - LOLALIZA</page-title>\n'
+        + '      <page-title xml:lang="fr">Look de la semaine - LOLALIZA</page-title>\n'
+        + '    </page-attributes>\n'
+        + '  </product>\n'
+        + '</catalog>\n';
+};
+
 const buildMultilineCatalogTagXml = () => {
     return `<?xml version="1.0" encoding="UTF-8"?>\n`
         + '<catalog\n'
@@ -420,6 +433,29 @@ test('parse preserves bundled-products and shared-option markup in reduced catal
     assert.doesNotMatch(output, /<bundled-products\s+product-id=/i);
     assert.match(output, /<shared-option\s+option-id="consoleWarranty"\s*\/>/i);
     assert.doesNotMatch(output, /option-id="\[object Object\]"/i);
+});
+
+test('parse preserves page-attributes container markup in reduced catalog output', async t => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'catalog-reducer-parser-'));
+    t.after(async () => {
+        await fs.rm(tempDir, { recursive: true, force: true });
+    });
+
+    const inputFilename = path.join(tempDir, 'page-attributes-input.xml');
+    const outputFilename = path.join(tempDir, 'page-attributes-output.xml');
+
+    await fs.writeFile(inputFilename, buildCatalogXmlWithPageAttributes(), 'utf8');
+
+    await parser.parse(inputFilename, outputFilename, {
+        ...baseConfig,
+        total: 1,
+        productIds: ['PAGE-ATTR-PRODUCT']
+    });
+
+    const output = await fs.readFile(outputFilename, 'utf8');
+
+    assert.match(output, /<page-attributes><page-title\s+xml:lang="x-default">Look of the week - LOLALIZA<\/page-title><page-title\s+xml:lang="fr">Look de la semaine - LOLALIZA<\/page-title><\/page-attributes>/i);
+    assert.doesNotMatch(output, /<page-attributes\s+xml:lang=/i);
 });
 
 test('parse filters configured source storefront catalogs by selected products while preserving structure', async t => {

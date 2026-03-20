@@ -45,6 +45,8 @@ This file tracks benchmark history for the mandatory full-input benchmark run ag
 | 2026-03-19T15:01:19Z | 7339d5f | main | mac16,7-apple-m4-pro-48gb | node-expat | v24.14.0 | 11.9.0 | benchmark1000 | `config/benchmark1000.json` | 1 | 5 | 29326.96 | 30399.67 | 29783.10 | 29628.56 | 30400.32 | `node scripts/benchmark.js -c config/benchmark1000.json -i files/source/puma-catalog.xml -o files/filtered/puma-bench-full-nodeexpat.xml -w 1 -r 5` | Replaced the hard `xmllint` XSD runtime dependency with bundled `xmllint-wasm` validation while preserving schema coverage for catalog, inventory, storefront, and pricebook outputs |
 
 | 2026-03-20T12:41:56Z | e59b76a | main | mac16,7-apple-m4-pro-48gb | node-expat | v24.14.0 | 11.9.0 | benchmark1000 | `config/benchmark1000.json` | 1 | 5 | 29095.26 | 29578.90 | 29368.95 | 29393.68 | 29595.01 | `node scripts/benchmark.js -c config/benchmark1000.json -i files/source/puma-catalog.xml -o files/filtered/puma-bench-full-nodeexpat.xml -w 1 -r 5` | Normalized bundled-products and parser-shaped shared-option serialization for storefront issue fixtures to restore catalog XSD validity |
+| 2026-03-20T14:00:58Z | 8aa96e7 | main | mac16,7-apple-m4-pro-48gb | node-expat | v24.14.0 | 11.9.0 | benchmark1000 | `config/benchmark1000.json` | 1 | 5 | 30548.79 | 31644.46 | 31055.12 | 30970.74 | 31658.61 | `node scripts/benchmark.js -c config/benchmark1000.json -i files/source/puma-catalog.xml -o files/filtered/puma-bench-full-nodeexpat.xml -w 1 -r 5` | Preserved page-attributes containers from real storefront issue sources by exempting them from parser single-child flattening and normalizing page-attribute child arrays for output serialization |
+| 2026-03-20T13:59:07Z | 8aa96e7 | main | mac16,7-apple-m4-pro-48gb | node-expat | v24.14.0 | 11.9.0 | benchmark1000 | `config/benchmark1000.json` | 1 | 5 | 30671.40 | 32111.90 | 31115.64 | 30920.41 | 32128.37 | `node scripts/benchmark.js -c config/benchmark1000.json -i files/source/puma-catalog.xml -o files/filtered/puma-bench-full-nodeexpat.xml -w 1 -r 5` | Preserved single-child page-attributes wrappers during parse and normalized page-attributes child arrays to restore catalog XSD validity for real storefront issue sources |
 
 ## ASCII Trend (Mean ms, lower is better)
 
@@ -76,6 +78,8 @@ Scale: each `#` is about 10,000 ms of mean runtime.
 - 2026-03-19T14:36:48Z | 30437.07 ms | ###
 - 2026-03-19T15:01:19Z | 29783.10 ms | ###
 - 2026-03-20T12:41:56Z | 29368.95 ms | ###
+- 2026-03-20T14:00:58Z | 31055.12 ms | ###
+- 2026-03-20T13:59:07Z | 31115.64 ms | ###
 
 ## Update Template
 
