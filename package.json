@@ -1,6 +1,6 @@
 {
   "name": "b2c-plugin-catalog-reducer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Catalog reducer for Salesforce B2C Commerce XML datasets.",
   "author": "Thomas Theunen",
   "bin": {

@@ -19,7 +19,7 @@ applyTo: '**'
    - `node -e "const fs=require('fs');const xml=fs.readFileSync('files/filtered/puma-test-quality.xml','utf8');const ids=[...xml.matchAll(/<product\s+product-id=\"([^\"]+)\"/g)].map(m=>m[1]);const unique=[...new Set(ids)].sort((a,b)=>a.localeCompare(b));console.log(unique.slice(0,5).join('\\n'));"`
    - For each sampled ID, inspect the source and filtered product semantically. Do not compare the full product as a raw XML string and do not compare raw reparsed object shapes directly.
    - Prefer editor/search inspection or a streaming helper for the source catalog. Avoid ad hoc `fs.readFileSync(..., 'utf8')` on the full source catalog during manual spot checks.
-   - Optional readability helper for the filtered output only:
+   - Optional readability helper for the filtered output only, if `xmllint` is installed locally:
    - `xmllint --format files/filtered/puma-test-quality.xml > /tmp/puma-test-quality.formatted.xml`
    - Confirm at minimum that these values are preserved when present:
    - display-name values

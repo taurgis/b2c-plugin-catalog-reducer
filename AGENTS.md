@@ -11,7 +11,7 @@ The tool reduces large catalog exports into smaller, representative fixtures and
 Tech stack:
 - Node.js CommonJS CLI
 - Root oclif command layer plus npm automation at the repository root
-- XML processing and validation via `xml-flow`, `node-expat`, `xml-formatter`, optional `xmllint` formatting, and `xmllint-wasm`
+- XML processing and validation via `xml-flow`, `node-expat`, `xml-formatter`, optional system `xmllint` formatting helpers, and `xmllint-wasm`
 
 ## Key Paths
 

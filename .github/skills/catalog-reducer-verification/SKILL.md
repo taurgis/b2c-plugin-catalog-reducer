@@ -63,7 +63,7 @@ Counts do not always need to be identical, but large mismatches indicate likely 
 - Unexpectedly empty selection when config requests non-zero totals
 - Duplicate or malformed product IDs in output XML
 - Missing root XML namespaces for catalog, inventory, or pricebook files
-- Validation failures from `tmp/lib/xmlSchemaValidator.js` or `xmllint`
+- Validation failures from `tmp/lib/xmlSchemaValidator.js` or optional local XML tooling such as `xmllint`
 
 ## Reporting Template
 
