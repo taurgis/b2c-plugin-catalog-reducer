@@ -4,6 +4,7 @@ import fixPageAttributes from './productModelFixers/fixPageAttributes';
 import fixProductSetProducts from './productModelFixers/fixProductSetProducts';
 import fixBundledProducts from './productModelFixers/fixBundledProducts';
 import fixImages from './productModelFixers/fixImages';
+import fixDeprecatedElements from './productModelFixers/fixDeprecatedElements';
 import {fixVariants, fixVariationVariants, fixVariationAttributes} from './productModelFixers/fixVariants';
 import {XmlNode} from './types';
 
@@ -42,5 +43,9 @@ export default class ProductModelFixers {
 
   static fixImages(product: XmlNode, modifiedProduct: XmlNode): void {
     return fixImages(product, modifiedProduct);
+  }
+
+  static fixDeprecatedElements(product: XmlNode, modifiedProduct: XmlNode): void {
+    return fixDeprecatedElements(product, modifiedProduct);
   }
 }

@@ -604,4 +604,40 @@ describe('ProductModelFixers', () => {
       ]
     });
   });
+
+  it('fixDeprecatedElements strips the 4 deprecated store-*-flag elements', () => {
+    const product: any = {
+      'store-force-price-flag': {$text: 'false'},
+      'store-non-inventory-flag': {$text: 'false'},
+      'store-non-revenue-flag': {$text: 'false'},
+      'store-non-discountable-flag': {$text: 'false'},
+      'online-flag': {$text: 'true'},
+      'store-attributes': {
+        'force-price-flag': {$text: 'false'},
+        'non-inventory-flag': {$text: 'false'},
+        'non-revenue-flag': {$text: 'false'},
+        'non-discountable-flag': {$text: 'false'}
+      }
+    };
+    const modifiedProduct = clone(product);
+
+    ProductModelFixers.fixDeprecatedElements(product, modifiedProduct);
+
+    expect(Object.prototype.hasOwnProperty.call(modifiedProduct, 'store-force-price-flag')).toBe(false);
+    expect(Object.prototype.hasOwnProperty.call(modifiedProduct, 'store-non-inventory-flag')).toBe(false);
+    expect(Object.prototype.hasOwnProperty.call(modifiedProduct, 'store-non-revenue-flag')).toBe(false);
+    expect(Object.prototype.hasOwnProperty.call(modifiedProduct, 'store-non-discountable-flag')).toBe(false);
+    // Siblings, including the non-deprecated store-attributes equivalents, are untouched.
+    expect(modifiedProduct['online-flag']).toEqual({$text: 'true'});
+    expect(modifiedProduct['store-attributes']).toEqual(product['store-attributes']);
+  });
+
+  it('fixDeprecatedElements is a no-op when none of the deprecated elements are present', () => {
+    const product: any = {'online-flag': {$text: 'true'}};
+    const modifiedProduct = clone(product);
+
+    ProductModelFixers.fixDeprecatedElements(product, modifiedProduct);
+
+    expect(modifiedProduct).toEqual({'online-flag': {$text: 'true'}});
+  });
 });

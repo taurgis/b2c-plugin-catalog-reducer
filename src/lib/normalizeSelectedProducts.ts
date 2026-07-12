@@ -15,6 +15,7 @@ export const normalizeProductForOutput = (product: XmlNode): XmlNode => {
   ProductModelFixers.fixPageAttributes(sourceProduct, modifiedProduct);
   ProductModelFixers.fixProductSetProducts(sourceProduct, modifiedProduct);
   ProductModelFixers.fixBundledProducts(sourceProduct, modifiedProduct);
+  ProductModelFixers.fixDeprecatedElements(sourceProduct, modifiedProduct);
 
   return modifiedProduct;
 };

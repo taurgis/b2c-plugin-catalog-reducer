@@ -81,6 +81,32 @@ const setDifference = (left, right) => {
 
 const isPrimitive = value => value === null || ['string', 'number', 'boolean'].includes(typeof value);
 
+// Elements the reducer intentionally strips from output (see
+// src/lib/productModelFixers/fixDeprecatedElements.ts) - deprecated,
+// duplicate-of-store-attributes fields per SFCC's catalog XSD. Excluded
+// from the source-vs-filtered diff below so their intentional removal
+// isn't reported as data loss.
+const INTENTIONALLY_STRIPPED_ELEMENT_KEYS = new Set([
+    'store-force-price-flag',
+    'store-non-inventory-flag',
+    'store-non-revenue-flag',
+    'store-non-discountable-flag'
+]);
+
+const stripIntentionallyRemovedElements = product => {
+    if (!product || typeof product !== 'object') {
+        return product;
+    }
+
+    const stripped = { ...product };
+
+    for (const key of INTENTIONALLY_STRIPPED_ELEMENT_KEYS) {
+        delete stripped[key];
+    }
+
+    return stripped;
+};
+
 const collectLeafValues = (value, bag) => {
     if (isPrimitive(value)) {
         bag.push(String(value));
@@ -486,13 +512,14 @@ async function main() {
     const shapeMismatches = [];
 
     for (const [productId, filteredProduct] of catalogData.productById.entries()) {
-        const sourceProduct = sourceData.selectedProductById.get(productId);
+        const rawSourceProduct = sourceData.selectedProductById.get(productId);
 
-        if (!sourceProduct) {
+        if (!rawSourceProduct) {
             missingSourceProducts.push(productId);
             continue;
         }
 
+        const sourceProduct = stripIntentionallyRemovedElements(rawSourceProduct);
         const valueComparison = compareLeafValueMultiset(sourceProduct, filteredProduct, maxExamples);
 
         if (valueComparison.missingTotal > 0 || valueComparison.extraTotal > 0) {
