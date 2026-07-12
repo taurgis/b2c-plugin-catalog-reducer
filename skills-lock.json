@@ -1,0 +1,369 @@
+{
+  "version": 4,
+  "skills": {
+    "b2c-extension-writing": {
+      "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
+      "sourceType": "local",
+      "computedHash": "85df551d5fd3a7e8c9453088c8fc8ee4825a3c388e4f097bce5aa0408e8085a3",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "repoPath": ".agents/skills/b2c-extension-writing/SKILL.md",
+      "installPath": ".agents/skills/b2c-extension-writing",
+      "installHash": "4623cf408e7bbd28b587123b8967c20de75b62ecb095a63ccce7bd6022bf507a",
+      "sourceHash": "85df551d5fd3a7e8c9453088c8fc8ee4825a3c388e4f097bce5aa0408e8085a3",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
+    "catalog-reducer-filter-development": {
+      "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
+      "sourceType": "local",
+      "computedHash": "3b6c86202bb90f26683e453cd01a25137e14730de398e6fdf52e384c13719b14",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "repoPath": ".agents/skills/catalog-reducer-filter-development/SKILL.md",
+      "installPath": ".agents/skills/catalog-reducer-filter-development",
+      "installHash": "a0a622f4d866526de7387ea4e30ad2f32a56368b8726fc6e84b1334babf5b137",
+      "sourceHash": "3b6c86202bb90f26683e453cd01a25137e14730de398e6fdf52e384c13719b14",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
+    "catalog-reducer-verification": {
+      "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
+      "sourceType": "local",
+      "computedHash": "c8119534ad3b6e8b1310f4b980e65f84c1106669db15aa80c46dd6852b89704b",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "repoPath": ".agents/skills/catalog-reducer-verification/SKILL.md",
+      "installPath": ".agents/skills/catalog-reducer-verification",
+      "installHash": "3bf8f55963d1fca1fc130dc12a8e9f76885b50339daf91bc6a42dfda30f8b458",
+      "sourceHash": "c8119534ad3b6e8b1310f4b980e65f84c1106669db15aa80c46dd6852b89704b",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
+    "oclif-json-and-errors": {
+      "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
+      "sourceType": "local",
+      "computedHash": "8cdfff387926820c69257d40f59538fce5a433891fcc1a84b86f8ce7c0768e35",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "repoPath": ".agents/skills/oclif-json-and-errors/SKILL.md",
+      "installPath": ".agents/skills/oclif-json-and-errors",
+      "installHash": "39483fd441b2f9c2731731d5f7f8e7985101e13c0958f69d39827f5f5b750b16",
+      "sourceHash": "8cdfff387926820c69257d40f59538fce5a433891fcc1a84b86f8ce7c0768e35",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
+    "oclif-plugin-system": {
+      "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
+      "sourceType": "local",
+      "computedHash": "b4d724aefd4cb9963460d44754d87baca55d8ea72a64a5dd71f0d9b836afa3a6",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "repoPath": ".agents/skills/oclif-plugin-system/SKILL.md",
+      "installPath": ".agents/skills/oclif-plugin-system",
+      "installHash": "dc9bcfafaa4eb0ff72b42f62f802a885c69845271c33e285ca403809e6f9c9c1",
+      "sourceHash": "b4d724aefd4cb9963460d44754d87baca55d8ea72a64a5dd71f0d9b836afa3a6",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
+    "skill-authoring": {
+      "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
+      "sourceType": "local",
+      "computedHash": "17adcef8e0c8a83bdafbb63ef17db53370c25c169c0cf8c1224e6ccfadfa88b2",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "repoPath": ".agents/skills/skill-authoring/SKILL.md",
+      "installPath": ".agents/skills/skill-authoring",
+      "installHash": "db6f941d50b93da41aaed617eb627d9451de9db4c8990c8f22fa57642d02947c",
+      "sourceHash": "17adcef8e0c8a83bdafbb63ef17db53370c25c169c0cf8c1224e6ccfadfa88b2",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
+    "ts-node-cli-maintainability": {
+      "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
+      "sourceType": "local",
+      "computedHash": "54384032fdadabd68254698dc6f4b6f9e2bf4fb39f109428fd25751fac12e38e",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "repoPath": ".agents/skills/ts-node-cli-maintainability/SKILL.md",
+      "installPath": ".agents/skills/ts-node-cli-maintainability",
+      "installHash": "6b880de760fe59bc463b0c85c56c40d2242e8535bf2d3d1dcc19056262eb1afc",
+      "sourceHash": "54384032fdadabd68254698dc6f4b6f9e2bf4fb39f109428fd25751fac12e38e",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
+    "vitest-cli-testing-and-mocking": {
+      "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
+      "sourceType": "local",
+      "computedHash": "04e51b471e5b3d5df824c53896730809284e1376a9698801773dc0b44ee2f928",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "repoPath": ".agents/skills/vitest-cli-testing-and-mocking/SKILL.md",
+      "installPath": ".agents/skills/vitest-cli-testing-and-mocking",
+      "installHash": "687439891e9c28c493de98ba649fcee0ce4bb861906f65842be2a637e4cb99dc",
+      "sourceHash": "04e51b471e5b3d5df824c53896730809284e1376a9698801773dc0b44ee2f928",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    }
+  },
+  "instructions": {
+    ".github/instructions/b2c-dx-developer-tools-expert-subagent.instructions.md": {
+      "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
+      "sourceType": "local",
+      "repoPath": ".github/instructions/b2c-dx-developer-tools-expert-subagent.instructions.md",
+      "installPath": ".github/instructions/b2c-dx-developer-tools-expert-subagent.instructions.md",
+      "computedHash": "907d325856feba463970c24c7ab964d65255317a4d7bfa53de82ab1d7e6c1724",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "installHash": "907d325856feba463970c24c7ab964d65255317a4d7bfa53de82ab1d7e6c1724",
+      "sourceHash": "2cf3612498504810759774fe34669c7f6a09f4b6b8d7dd3882588448d655919d",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
+    ".github/instructions/benchmark-result-tracking.instructions.md": {
+      "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
+      "sourceType": "local",
+      "repoPath": ".github/instructions/benchmark-result-tracking.instructions.md",
+      "installPath": ".github/instructions/benchmark-result-tracking.instructions.md",
+      "computedHash": "04f0f855b41b45b5242aeac57ed54fe1b5bf48fc89f65711b35c205637586d5f",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "installHash": "04f0f855b41b45b5242aeac57ed54fe1b5bf48fc89f65711b35c205637586d5f",
+      "sourceHash": "2bd31725217ffda6ce142cf69d26c085a519198fcbaac781a65b6767f4554e46",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
+    ".github/instructions/output-integrity-verification.instructions.md": {
+      "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
+      "sourceType": "local",
+      "repoPath": ".github/instructions/output-integrity-verification.instructions.md",
+      "installPath": ".github/instructions/output-integrity-verification.instructions.md",
+      "computedHash": "60ccde9b76b2f8682493c6773b547a70f21165531eb2f34ece649a672212a586",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "installHash": "60ccde9b76b2f8682493c6773b547a70f21165531eb2f34ece649a672212a586",
+      "sourceHash": "ca95f09814dc1bd8a267243ba7f5f35182ebcd489ae4c73f46a999273422b16c",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
+    ".github/instructions/pm-ba-subagent-research.instructions.md": {
+      "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
+      "sourceType": "local",
+      "repoPath": ".github/instructions/pm-ba-subagent-research.instructions.md",
+      "installPath": ".github/instructions/pm-ba-subagent-research.instructions.md",
+      "computedHash": "462e72ed92305980c422f59bebb1fd81c1f6c21b2640572068a28621a8378345",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "installHash": "462e72ed92305980c422f59bebb1fd81c1f6c21b2640572068a28621a8378345",
+      "sourceHash": "9d92bed70bf7379057c364c01499df14a3f9a4450270ce05e81b82e8837d77bd",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
+    ".github/instructions/repo-research.instructions.md": {
+      "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
+      "sourceType": "local",
+      "repoPath": ".github/instructions/repo-research.instructions.md",
+      "installPath": ".github/instructions/repo-research.instructions.md",
+      "computedHash": "891565a4d2c90b6a8d9b411ba85d6398b145a43139ea4765f9effbff264aaa1a",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "installHash": "891565a4d2c90b6a8d9b411ba85d6398b145a43139ea4765f9effbff264aaa1a",
+      "sourceHash": "71f0ed167f8af8fa214a9b86751b5eae2ef01e8b55c6d24ae5585ee85dab528d",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
+    ".github/instructions/skill-maintenance.instructions.md": {
+      "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
+      "sourceType": "local",
+      "repoPath": ".github/instructions/skill-maintenance.instructions.md",
+      "installPath": ".github/instructions/skill-maintenance.instructions.md",
+      "computedHash": "d1c1d3ac66069f111ad6672891fc11cb58bcd698e73acdbdbe64ae54813a29d1",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "installHash": "d1c1d3ac66069f111ad6672891fc11cb58bcd698e73acdbdbe64ae54813a29d1",
+      "sourceHash": "d1c5c74ea94e7aa7c8c2754d790df97bc529892070eed917a1ba3f42ed84077c",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
+    "AGENTS.md": {
+      "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
+      "sourceType": "local",
+      "repoPath": "AGENTS.md",
+      "installPath": "AGENTS.md",
+      "computedHash": "bbc6659807aa316c42286658c1c57b73cd8a3a5724fec7c2107f54d3f483710b",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "installHash": "bbc6659807aa316c42286658c1c57b73cd8a3a5724fec7c2107f54d3f483710b",
+      "sourceHash": "bbc6659807aa316c42286658c1c57b73cd8a3a5724fec7c2107f54d3f483710b",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    }
+  },
+  "customAgents": {
+    ".github/agents/b2c-dx-developer-tools-expert.agent.md": {
+      "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
+      "sourceType": "local",
+      "repoPath": ".github/agents/b2c-dx-developer-tools-expert.agent.md",
+      "installPath": ".github/agents/b2c-dx-developer-tools-expert.agent.md",
+      "computedHash": "a7936d5f168ad79e3da43d11dbc5efff0bf27a3fb7952644b649efd133ce5ab7",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "installHash": "a7936d5f168ad79e3da43d11dbc5efff0bf27a3fb7952644b649efd133ce5ab7",
+      "sourceHash": "bf354dd6d282eba126beef0689b5b97b84448024d5b935d53f0995795dc35b9f",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
+    ".github/agents/business-analyst.agent.md": {
+      "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
+      "sourceType": "local",
+      "repoPath": ".github/agents/business-analyst.agent.md",
+      "installPath": ".github/agents/business-analyst.agent.md",
+      "computedHash": "3745270c3aa372090996a639b4c10e57360b8a1209b7783163df58b964af8c87",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "installHash": "3745270c3aa372090996a639b4c10e57360b8a1209b7783163df58b964af8c87",
+      "sourceHash": "6b003509cef8b1d89c760f57d64e5f3ac523d9bb82131a6121797ab0b11b5397",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
+    ".github/agents/official-docs-researcher.agent.md": {
+      "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
+      "sourceType": "local",
+      "repoPath": ".github/agents/official-docs-researcher.agent.md",
+      "installPath": ".github/agents/official-docs-researcher.agent.md",
+      "computedHash": "e0a5818e8dd09d9eb4fc3a465afb81037328396ffce498f940b3a3ff60ef10b4",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "installHash": "e0a5818e8dd09d9eb4fc3a465afb81037328396ffce498f940b3a3ff60ef10b4",
+      "sourceHash": "1ac7c2976069b8db35811beaf2b8fa2a1c3db3528724b910b7de9e17aa56f029",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
+    ".github/agents/project-manager.agent.md": {
+      "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
+      "sourceType": "local",
+      "repoPath": ".github/agents/project-manager.agent.md",
+      "installPath": ".github/agents/project-manager.agent.md",
+      "computedHash": "491a75008247ac027dd88348ee7d2d6159989454b7d52ea2c2081352daa47a8c",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "installHash": "491a75008247ac027dd88348ee7d2d6159989454b7d52ea2c2081352daa47a8c",
+      "sourceHash": "da75d1a9238a767e93d063e3c756c8e6ce65d4866356bbafff7e1c6c6c6e512b",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
+    ".github/agents/senior-qa-engineer.agent.md": {
+      "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
+      "sourceType": "local",
+      "repoPath": ".github/agents/senior-qa-engineer.agent.md",
+      "installPath": ".github/agents/senior-qa-engineer.agent.md",
+      "computedHash": "97f1e3d679ba881dcc8d2ba7fad587dcc5754c0754e1bc966e0eaeb8ac195198",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "installHash": "97f1e3d679ba881dcc8d2ba7fad587dcc5754c0754e1bc966e0eaeb8ac195198",
+      "sourceHash": "948978a5e878bacaf09a0a2c1280f6376143364ab6a0670354dbcf51816e61e0",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    }
+  }
+}

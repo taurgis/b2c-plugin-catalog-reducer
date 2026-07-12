@@ -17,7 +17,7 @@ Tech stack:
 
 - `.github/agents/`: custom subagents for governed repo work
 - `.github/instructions/`: repo workflow and subagent routing rules
-- `.github/skills/`: reusable skills for plugin authoring and reducer maintenance
+- `.agents/skills/`: reusable skills for plugin authoring and reducer maintenance
 - `bin/`: root oclif entrypoints
 - `src/commands/`: root oclif command implementations
 - `src/lib/`: root wrapper helpers and command support code

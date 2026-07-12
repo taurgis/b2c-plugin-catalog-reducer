@@ -1,7 +1,6 @@
----
-description: 'Require PM, BA, Senior QA Engineer, and Official Docs research for governed changes'
-applyTo: '**'
----
+<!-- GENERATED: forward-nexus ide-sync -->
+
+Source: `.github/instructions/pm-ba-subagent-research.instructions.md`
 
 # PM, BA, Senior QA Engineer, and Official Docs Research Requirement
 

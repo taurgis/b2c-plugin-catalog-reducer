@@ -1,7 +1,9 @@
 ---
-description: 'Require PM, BA, Senior QA Engineer, and Official Docs research for governed changes'
-applyTo: '**'
+trigger: always_on
+description: "Require PM, BA, Senior QA Engineer, and Official Docs research for governed changes"
 ---
+
+<!-- GENERATED: forward-nexus ide-sync -->
 
 # PM, BA, Senior QA Engineer, and Official Docs Research Requirement
 
