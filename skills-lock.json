@@ -109,6 +109,24 @@
       "versionPolicy": "minor",
       "includePrerelease": false
     },
+    "thermo-nuclear-code-quality-review": {
+      "source": "cursor/plugins",
+      "sourceType": "github",
+      "computedHash": "336d309513dfbb761f2ef853f57d6da2733f7ffcd2428168f18b996db12e0d5c",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "repoPath": "cursor-team-kit/skills/thermo-nuclear-code-quality-review/SKILL.md",
+      "installPath": ".agents/skills/thermo-nuclear-code-quality-review",
+      "installHash": "9052b01b46b1d8dbf94c45f9313ec1983443f9a460e83d49cdc7fe0f640ca476",
+      "sourceHash": "336d309513dfbb761f2ef853f57d6da2733f7ffcd2428168f18b996db12e0d5c",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
     "ts-node-cli-maintainability": {
       "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
       "sourceType": "local",
@@ -362,6 +380,24 @@
       ],
       "installHash": "97f1e3d679ba881dcc8d2ba7fad587dcc5754c0754e1bc966e0eaeb8ac195198",
       "sourceHash": "948978a5e878bacaf09a0a2c1280f6376143364ab6a0670354dbcf51816e61e0",
+      "versionPolicy": "minor",
+      "includePrerelease": false
+    },
+    ".github/agents/thermo-nuclear-code-quality-review.agent.md": {
+      "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
+      "sourceType": "local",
+      "repoPath": ".github/agents/thermo-nuclear-code-quality-review.agent.md",
+      "installPath": ".github/agents/thermo-nuclear-code-quality-review.agent.md",
+      "computedHash": "19ba74bf19e4757c4a9d58c94ada2791f0d5e1b250981b782f06305c7099a018",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "installHash": "19ba74bf19e4757c4a9d58c94ada2791f0d5e1b250981b782f06305c7099a018",
+      "sourceHash": "af2d90b502c1b8b4090fb4b24d9c851d7eff23ef723a4c87f8a56d25e6417af1",
       "versionPolicy": "minor",
       "includePrerelease": false
     }
