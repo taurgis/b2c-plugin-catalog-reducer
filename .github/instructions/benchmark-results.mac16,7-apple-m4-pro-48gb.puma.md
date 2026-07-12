@@ -49,6 +49,7 @@ This file tracks benchmark history for the mandatory full-input benchmark run ag
 | 2026-03-20T13:59:07Z | 8aa96e7 | main | mac16,7-apple-m4-pro-48gb | node-expat | v24.14.0 | 11.9.0 | benchmark1000 | `config/benchmark1000.json` | 1 | 5 | 30671.40 | 32111.90 | 31115.64 | 30920.41 | 32128.37 | `node scripts/benchmark.js -c config/benchmark1000.json -i files/source/puma-catalog.xml -o files/filtered/puma-bench-full-nodeexpat.xml -w 1 -r 5` | Preserved single-child page-attributes wrappers during parse and normalized page-attributes child arrays to restore catalog XSD validity for real storefront issue sources |
 | 2026-07-12T18:26:50Z | d8baa31 | worktree-agent-ad3b38357d8574457 (pending merge to main) | mac16,7-apple-m4-pro-48gb | node-expat | v24.18.0 | 11.16.0 | benchmark1000 | `config/benchmark1000.json` | 1 | 5 | 28468.20 | 28628.91 | 28553.15 | 28571.60 | 28638.71 | `node scripts/benchmark.js -c ./config/benchmark1000.json -i files/source/puma-catalog.xml -o files/filtered/puma-bench-full-nodeexpat.xml -w 1 -r 5` | M1: ported reducer.js and root lib/** into TypeScript under src/lib/**, now running in-process (removed the child_process.spawn wrapper in src/lib/reducer-runner.ts); golden-master diff confirmed byte-identical catalog/inventory output vs. the legacy path across all config/*.json fixtures; no performance regression |
 | 2026-07-12T18:43:04Z | 6c3176e | main | mac16,7-apple-m4-pro-48gb | node-expat | v24.18.0 | 11.16.0 | benchmark1000 | `config/benchmark1000.json` | 1 | 5 | 29063.93 | 29390.34 | 29230.91 | 29276.24 | 29393.68 | `node scripts/benchmark.js -c ./config/benchmark1000.json -i files/source/puma-catalog.xml -o files/filtered/puma-bench-full-nodeexpat.xml -w 1 -r 5` | M2: added `fixDeprecatedElements` product-model fixer stripping the 4 deprecated store-*-flag catalog elements (per XSD annotations pointing to their store-attributes equivalents); output-integrity script updated with an allowlist for the intentional removal; no performance regression |
+| 2026-07-12T18:54:00Z | a48a054 | main | mac16,7-apple-m4-pro-48gb | node-expat | v24.18.0 | 11.16.0 | benchmark1000 | `config/benchmark1000.json` | 1 | 5 | 28771.16 | 28927.11 | 28838.31 | 28823.26 | 28940.70 | `node scripts/benchmark.js -c ./config/benchmark1000.json -i files/source/puma-catalog.xml -o files/filtered/puma-bench-full-nodeexpat.xml -w 1 -r 5` | M3: added an opt-in friendly nested config shape (discriminated by a `$schema` marker) converted to the canonical shape before reaching selection logic; benchmark1000.json itself is unaffected (canonical shape, no `$schema` key); no performance regression |
 
 ## ASCII Trend (Mean ms, lower is better)
 
@@ -84,6 +85,7 @@ Scale: each `#` is about 10,000 ms of mean runtime.
 - 2026-03-20T13:59:07Z | 31115.64 ms | ###
 - 2026-07-12T18:26:50Z | 28553.15 ms | ###
 - 2026-07-12T18:43:04Z | 29230.91 ms | ###
+- 2026-07-12T18:54:00Z | 28838.31 ms | ###
 
 ## Update Template
 
