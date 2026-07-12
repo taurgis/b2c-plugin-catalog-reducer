@@ -181,6 +181,15 @@ export default class Filter {
     return this.runtimeState.totalTarget > 0 && this.statistics.total < this.runtimeState.totalTarget;
   }
 
+  /**
+   * Exposes the same online-flag gating `execute()` applies per streamed
+   * product, for filters (e.g. FillerProductsFilter) that need to evaluate
+   * it themselves outside the base streaming loop.
+   */
+  isProductOnline(product: XmlNode): boolean {
+    return isOnlineFlagEnabled(product['online-flag'], this.onlineSiteIdSet);
+  }
+
   markSelectedProductId(productId: string | null | undefined): void {
     if (!productId) {
       return;

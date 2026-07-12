@@ -204,37 +204,35 @@ describe('FilterManager pipeline', () => {
     expect(new Set(productIds).size).toBe(productIds.length);
   });
 
-  it('filler filter marks master-linked variants and variation groups as selected', () => {
+  it('filler filter marks master-linked variants and variation groups as selected without selecting the master itself', async () => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'catalog-reducer-filler-master-link-'));
+    tempDirs.push(tempDir);
+
+    const inputFilename = path.join(tempDir, 'input.xml');
+    await fs.writeFile(inputFilename, '<?xml version="1.0" encoding="UTF-8"?>\n'
+      + '<catalog xmlns="http://www.demandware.com/xml/impex/catalog/2006-10-31" catalog-id="filler-master-link">\n'
+      + '  <product product-id="MASTER-1">\n'
+      + '    <online-flag>true</online-flag>\n'
+      + '    <variations>\n'
+      + '      <variants><variant product-id="VAR-1"/></variants>\n'
+      + '      <variation-groups><variation-group product-id="VG-1"/></variation-groups>\n'
+      + '    </variations>\n'
+      + '  </product>\n'
+      + '</catalog>\n', 'utf8');
+
     const statistics = createFilterStatistics();
     const runtimeState: FilterRuntimeState = {
       totalTarget: 5,
       preferredProductIds: new Set()
     };
-    const progress = createProgressStub();
-    const filter = new FillerProductsFilter('unused.xml', {}, statistics, progress, runtimeState);
+    const filter = new FillerProductsFilter(inputFilename, {}, statistics, createProgressStub(), runtimeState);
 
-    const result = filter.process({
-      variations: {
-        variants: {
-          variant: {
-            $attrs: {
-              'product-id': 'VAR-1'
-            }
-          }
-        },
-        'variation-groups': {
-          'variation-group': {
-            $attrs: {
-              'product-id': 'VG-1'
-            }
-          }
-        }
-      }
-    });
+    const results = await filter.execute();
 
-    expect(result).toEqual({finished: false});
+    expect(results).toEqual([]);
     expect(statistics.productIds.has('VAR-1')).toBe(true);
     expect(statistics.productIds.has('VG-1')).toBe(true);
+    expect(statistics.total).toBe(0);
   });
 
   it('master filter shouldSkip reflects master target progress', () => {
@@ -281,10 +279,11 @@ describe('FilterManager pipeline', () => {
     expect(filter.shouldSkip()).toBe(true);
   });
 
-  it('preferred products filter captures filler candidates and excludes master-linked products', () => {
+  it('preferred products filter captures every eligible filler candidate uncapped, and excludes master-linked products', () => {
     const {filter, runtimeState} = createPreferredProductsFilter({
       preferredProductIds: [],
-      enableCapturedFiller: true
+      enableCapturedFiller: true,
+      totalTarget: 100
     });
 
     filter.process({
@@ -327,24 +326,29 @@ describe('FilterManager pipeline', () => {
       }
     });
 
+    // Excluded via the master-linked check above, so not captured.
     expect(runtimeState.fillerCandidates!.length).toBe(0);
 
-    filter.process({
-      $attrs: {
-        'product-id': 'FILL-1'
-      },
-      images: {
-        'image-group': {
-          image: {
-            $attrs: {
-              path: '/fill-1.jpg'
+    // Capture is not capped to totalTarget - computeCategoryQuotas needs
+    // the true size of every category to apportion correctly, so every
+    // eligible candidate found during this pass is kept.
+    for (let i = 0; i < 150; i++) {
+      filter.process({
+        $attrs: {
+          'product-id': `FILL-${i}`
+        },
+        images: {
+          'image-group': {
+            image: {
+              $attrs: {
+                path: `/fill-${i}.jpg`
+              }
             }
           }
         }
-      }
-    });
+      });
+    }
 
-    expect(runtimeState.fillerCandidates!.length).toBe(1);
-    expect(runtimeState.fillerCandidates![0].$attrs['product-id']).toBe('FILL-1');
+    expect(runtimeState.fillerCandidates!.length).toBe(150);
   });
 });

@@ -125,6 +125,56 @@ describe('selectionPipeline', () => {
     ]);
   });
 
+  it('captured-during-preferred-pass filler selection is category-proportional, not just first-come-first-served', async () => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'catalog-reducer-selection-pipeline-captured-quota-'));
+    tempDirs.push(tempDir);
+    const inputFilename = path.join(tempDir, 'master-with-filler.xml');
+    // MASTER-1's one real variant (VAR-1) is resolved by PreferredProductsFilter
+    // itself, so remaining capacity is exactly totalTarget - 2 (MASTER-1 + VAR-1)
+    // with no "phantom" leftover from an unresolvable variant id.
+    const products = [
+      '<product product-id="MASTER-1"><online-flag>true</online-flag>'
+        + '<variations>'
+        + '<attributes><variation-attribute attribute-id="size" variation-attribute-id="size"/></attributes>'
+        + '<variants><variant product-id="VAR-1"/></variants>'
+        + '</variations></product>',
+      '<product product-id="VAR-1"><online-flag>true</online-flag></product>'
+    ];
+
+    for (let i = 0; i < 8; i++) {
+      products.push(`<product product-id="SHOE-${i}"><online-flag>true</online-flag>`
+        + '<images><image-group view-type="large"><image path="images/x.jpg"/></image-group></images>'
+        + '<classification-category catalog-id="site-1">shoes</classification-category></product>');
+    }
+
+    for (let i = 0; i < 2; i++) {
+      products.push(`<product product-id="HAT-${i}"><online-flag>true</online-flag>`
+        + '<images><image-group view-type="large"><image path="images/x.jpg"/></image-group></images>'
+        + '<classification-category catalog-id="site-1">hats</classification-category></product>');
+    }
+
+    const xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+      + `<catalog xmlns="http://www.demandware.com/xml/impex/catalog/2006-10-31" catalog-id="pipeline-captured-quota">${products.join('')}</catalog>`;
+
+    await fs.writeFile(inputFilename, xml, 'utf8');
+
+    const selectorConfig = {total: 5, master: 1, productIds: [], attributes: {custom: []}};
+
+    expect(getFilterNames(selectorConfig)).toEqual(['MasterFilter', 'PreferredProductsFilter']);
+
+    const selection = await selectProducts(inputFilename, selectorConfig, createProgressStub() as any);
+    const ids = selection.map(product => product.$attrs['product-id']);
+
+    // totalTarget grows from 5 to 6 (MASTER-1's one variant); MASTER-1 +
+    // VAR-1 consume 2, leaving capacity 4 for the proportional 80/20 split
+    // of 8 shoes / 2 hats -> floor(4*8/10)=3, floor(4*2/10)=0 (+1 remainder,
+    // smallest-category-first) = 3 shoes + 1 hat. Not stream order.
+    expect(ids).toEqual(expect.arrayContaining(['MASTER-1', 'VAR-1']));
+    expect(ids.filter(id => id.startsWith('SHOE-')).length).toBe(3);
+    expect(ids.filter(id => id.startsWith('HAT-')).length).toBe(1);
+    expect(ids.length).toBe(6);
+  });
+
   it('produces the same selection across two sequential in-process invocations with different configs (no cross-invocation state leakage)', async () => {
     const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'catalog-reducer-selection-pipeline-multi-'));
     tempDirs.push(tempDir);

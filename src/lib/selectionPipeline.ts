@@ -39,6 +39,14 @@ export const buildFilterPlan = (selectorConfig: SelectorConfig): FilterClass[] =
     filters.push(AttributeFilter);
   }
 
+  // When master/preferred selection is already doing a full-file pass,
+  // PreferredProductsFilter opportunistically captures filler candidates
+  // (untruncated, tagged by category - see preferredProductsFilter.ts and
+  // FilterManager#appendCapturedFillerSelection) during that same pass
+  // instead of paying for a second one here. FillerProductsFilter only
+  // runs its own standalone pass when that optimization doesn't apply
+  // (custom attributes configured, or neither master nor preferred
+  // selection is - e.g. a total-only config).
   if (hasAnySelectionTarget(selectorConfig) && !canCaptureFillerDuringPreferredPass(selectorConfig)) {
     filters.push(FillerProductsFilter);
   }

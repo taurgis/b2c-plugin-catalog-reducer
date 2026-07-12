@@ -113,7 +113,11 @@ describe('selectorConfig', () => {
 
   it('every existing config/*.json fixture uses the canonical shape (no $schema key), so friendly-shape conversion never runs for them', async () => {
     const configDir = path.resolve(__dirname, '../../config');
-    const fixtureNames = (await fs.readdir(configDir)).filter(name => name.endsWith('.json'));
+    // friendly-example.json is intentionally an example of the *other*
+    // shape (see README.md's Friendly Config Shape section) - excluded here
+    // since this test guards against existing canonical fixtures drifting,
+    // not against the example that documents the new shape.
+    const fixtureNames = (await fs.readdir(configDir)).filter(name => name.endsWith('.json') && name !== 'friendly-example.json');
 
     expect(fixtureNames.length).toBeGreaterThan(0);
 

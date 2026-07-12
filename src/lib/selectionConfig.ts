@@ -18,6 +18,13 @@ export const hasAnySelectionTarget = (selectorConfig: SelectorConfig): boolean =
     || hasPreferredProductIds(selectorConfig);
 };
 
+/**
+ * True when filler candidates can be captured opportunistically during
+ * PreferredProductsFilter's own pass (see preferredProductsFilter.ts),
+ * instead of paying for a second full-file scan via a standalone
+ * FillerProductsFilter run. Only safe when nothing else needs its own
+ * dedicated pass first (custom attributes do).
+ */
 export const canCaptureFillerDuringPreferredPass = (selectorConfig: SelectorConfig): boolean => {
   return !hasCustomAttributeSelection(selectorConfig)
     && (hasPreferredProductIds(selectorConfig) || hasMasterSelection(selectorConfig));

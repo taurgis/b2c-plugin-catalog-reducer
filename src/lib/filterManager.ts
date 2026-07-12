@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 
+import {getCategoryKey, selectByCategoryQuota} from './categoryQuota';
 import Filter, {FilterRuntimeState, FilterStatistics} from './filters/filter';
 import {normalizeSelectedProducts} from './normalizeSelectedProducts';
 import {normalizeRuntimeOptions} from './runtimeSupport';
@@ -58,6 +59,13 @@ export default class FilterManager {
     this.progress = runtime.progress;
   }
 
+  /**
+   * Selects up to remaining capacity from the filler candidates
+   * PreferredProductsFilter captured opportunistically during its own
+   * pass, using the same category-proportional quota logic as the
+   * standalone FillerProductsFilter (see ../categoryQuota.ts) - so the
+   * outcome is consistent regardless of which of the two code paths ran.
+   */
   #appendCapturedFillerSelection = (): void => {
     if (
       !this.runtimeState.enableCapturedFiller
@@ -67,17 +75,37 @@ export default class FilterManager {
       return;
     }
 
-    for (let i = 0; i < this.runtimeState.fillerCandidates!.length; i++) {
-      if (!this.runtimeState.totalTarget || this.statistics.total >= this.runtimeState.totalTarget) {
-        break;
-      }
+    const capacity = this.runtimeState.totalTarget
+      ? Math.max(0, this.runtimeState.totalTarget - this.statistics.total)
+      : 0;
 
-      const product = this.runtimeState.fillerCandidates![i];
+    if (!capacity) {
+      return;
+    }
+
+    const candidatesByCategory = new Map<string, XmlNode[]>();
+
+    for (const product of this.runtimeState.fillerCandidates!) {
       const productId = product && product.$attrs ? product.$attrs['product-id'] : null;
 
       if (!productId || this.statistics.productIds.has(productId)) {
         continue;
       }
+
+      const categoryKey = getCategoryKey(product);
+      const bucket = candidatesByCategory.get(categoryKey);
+
+      if (bucket) {
+        bucket.push(product);
+      } else {
+        candidatesByCategory.set(categoryKey, [product]);
+      }
+    }
+
+    const selected = selectByCategoryQuota(candidatesByCategory, capacity);
+
+    for (const product of selected) {
+      const productId = product.$attrs['product-id'];
 
       this.selection.push(product);
       this.statistics.productIds.add(productId);
