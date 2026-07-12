@@ -178,6 +178,31 @@ Config files can live anywhere. The example below works as a standalone JSON con
 
 - `onlineSiteIds`: restricts online status to the listed site IDs. A configured site counts as online if the product has an explicit site-specific `<online-flag site-id="...">true</online-flag>` for it, or, when that site has no explicit override, if the global `<online-flag>` is `true` (mirroring SFCC's per-site attribute inheritance). The product is kept if at least one configured site is online. Leave empty (the default) to keep the prior behavior: a product is online if any online-flag (site-specific or global) is `true`.
 
+### Friendly Config Shape
+
+A nested, more readable config shape is also accepted, discriminated by an explicit `$schema` marker (any config without a `$schema` key is treated as the canonical flat shape above - existing configs need no changes):
+
+```json
+{
+	"$schema": "catalog-reducer-config@1",
+	"selection": {
+		"totalProducts": 1000,
+		"masterProducts": 100,
+		"productIds": ["ID1", "ID2"],
+		"attributes": [
+			{ "id": "someAttribute", "count": 50 },
+			{ "id": "someOtherAttribute", "value": "some value", "count": 100 }
+		]
+	},
+	"sites": { "onlineSiteIds": [] },
+	"pricebook": { "randomSeed": null, "sourceFiles": [] },
+	"storefront": { "sourceFiles": [] },
+	"output": { "beautify": true }
+}
+```
+
+See `config/friendly-example.json` for a complete example. Every field maps 1:1 to its canonical-shape equivalent; omitted fields/sections fall back to the same defaults as the flat shape. A `$schema` value other than `catalog-reducer-config@1` is rejected with a clear error rather than silently falling back to defaults.
+
 ## Examples
 
 Config file from an arbitrary path:

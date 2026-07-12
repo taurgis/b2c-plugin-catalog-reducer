@@ -1,6 +1,7 @@
 import fsPromises from 'node:fs/promises';
 import path from 'node:path';
 
+import {convertFriendlyConfigToCanonical, isFriendlyConfigShape} from './friendlyConfig';
 import {SelectorConfig} from './types';
 
 export const DEFAULT_SELECTOR_CONFIG: SelectorConfig = {
@@ -69,5 +70,9 @@ export const loadConfigFile = async (configFilePath: string, invocationCwd: stri
   const configFileContents = await fsPromises.readFile(resolvedConfigFilePath, 'utf8');
   const parsedConfig = JSON.parse(configFileContents);
 
-  return normalizeConfigRelativePaths(mergeConfig(parsedConfig), resolvedConfigFilePath);
+  const canonicalConfig = isFriendlyConfigShape(parsedConfig)
+    ? convertFriendlyConfigToCanonical(parsedConfig)
+    : parsedConfig;
+
+  return normalizeConfigRelativePaths(mergeConfig(canonicalConfig), resolvedConfigFilePath);
 };

@@ -83,4 +83,43 @@ describe('selectorConfig', () => {
   it('loadConfigFile rejects when the config file does not exist', async () => {
     await expect(loadConfigFile('/nonexistent/config.json')).rejects.toThrow();
   });
+
+  it('loadConfigFile accepts the friendly nested config shape and converts it to canonical fields', async () => {
+    const tempDir = await mkTempDir();
+    const configPath = path.join(tempDir, 'config.json');
+    await fs.writeFile(configPath, JSON.stringify({
+      $schema: 'catalog-reducer-config@1',
+      selection: {totalProducts: 20, masterProducts: 5, productIds: ['A1']},
+      sites: {onlineSiteIds: ['MX']}
+    }), 'utf8');
+
+    const config = await loadConfigFile(configPath);
+
+    expect(config.total).toBe(20);
+    expect(config.master).toBe(5);
+    expect(config.productIds).toEqual(['A1']);
+    expect(config.onlineSiteIds).toEqual(['MX']);
+    // Fields not present in the friendly config still fall back to defaults.
+    expect(config.attributes).toEqual(DEFAULT_SELECTOR_CONFIG.attributes);
+  });
+
+  it('loadConfigFile rejects a friendly-shape config with an unrecognized $schema', async () => {
+    const tempDir = await mkTempDir();
+    const configPath = path.join(tempDir, 'config.json');
+    await fs.writeFile(configPath, JSON.stringify({$schema: 'not-a-real-schema', selection: {totalProducts: 20}}), 'utf8');
+
+    await expect(loadConfigFile(configPath)).rejects.toThrow(/Unsupported config \$schema/);
+  });
+
+  it('every existing config/*.json fixture uses the canonical shape (no $schema key), so friendly-shape conversion never runs for them', async () => {
+    const configDir = path.resolve(__dirname, '../../config');
+    const fixtureNames = (await fs.readdir(configDir)).filter(name => name.endsWith('.json'));
+
+    expect(fixtureNames.length).toBeGreaterThan(0);
+
+    for (const fixtureName of fixtureNames) {
+      const raw = await fs.readFile(path.join(configDir, fixtureName), 'utf8');
+      expect(JSON.parse(raw)).not.toHaveProperty('$schema');
+    }
+  });
 });
