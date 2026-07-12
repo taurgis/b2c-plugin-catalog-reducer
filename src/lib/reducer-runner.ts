@@ -1,6 +1,4 @@
-import {spawn} from 'node:child_process';
-import {existsSync} from 'node:fs';
-import path from 'node:path';
+import {runCatalogReduce} from './reduce/runCatalogReduce';
 
 export type ReducerRunOptions = {
   cache?: boolean;
@@ -11,90 +9,29 @@ export type ReducerRunOptions = {
   output: string;
 };
 
-export type ReducerInvocation = {
-  args: string[];
-  command: string;
-  cwd: string;
-};
-
-const repoRoot = path.resolve(__dirname, '..', '..');
-const reducerEntry = path.join(repoRoot, 'reducer.js');
-
-const resolveInputPath = (inputPath: string, invocationCwd: string): string => {
-  if (path.isAbsolute(inputPath)) {
-    return inputPath;
-  }
-
-  return path.resolve(invocationCwd, inputPath);
-};
-
-const resolveOutputPath = (outputPath: string, invocationCwd: string): string => {
-  if (path.isAbsolute(outputPath)) {
-    return outputPath;
-  }
-
-  return path.resolve(invocationCwd, outputPath);
-};
-
-const resolveConfigPath = (configPath: string, invocationCwd: string): string => {
-  if (path.isAbsolute(configPath)) {
-    return configPath;
-  }
-
-  return path.resolve(invocationCwd, configPath);
-};
-
-export const buildReducerInvocation = (options: ReducerRunOptions): ReducerInvocation => {
-  if (!existsSync(reducerEntry)) {
-    throw new Error(`Reducer entrypoint not found at ${reducerEntry}`);
-  }
-
+/**
+ * Runs the catalog reduce workflow in-process (see src/lib/reduce/**).
+ *
+ * Previously this spawned `reducer.js` as a child process and resolved with
+ * its exit code (0 on success, non-zero if the child's `main()` caught an
+ * error and set `process.exitCode`). Now that the logic runs directly in
+ * this process, there is no child exit code to relay: this resolves `0` on
+ * success and rejects with the underlying error on failure. `reduce.ts`
+ * already supports both outcomes (it checks `exitCode !== 0` and also
+ * catches/rejects), so its `exitCode !== 0` branch is preserved but is now
+ * unreachable dead code rather than something exercised in practice.
+ */
+export const runReducer = async (options: ReducerRunOptions): Promise<number> => {
   const invocationCwd = options.invocationCwd ?? process.cwd();
 
-  const args = [
-    reducerEntry,
-    '-i',
-    resolveInputPath(options.input, invocationCwd),
-    '-o',
-    resolveOutputPath(options.output, invocationCwd)
-  ];
-
-  if (options.config) {
-    args.push('-c', resolveConfigPath(options.config, invocationCwd));
-  }
-
-  if (options.dryRun) {
-    args.push('--dry-run');
-  }
-
-  if (options.cache === false) {
-    args.push('--no-cache');
-  }
-
-  return {
-    args,
-    command: process.execPath,
-    cwd: repoRoot
-  };
-};
-
-export const runReducer = async (options: ReducerRunOptions): Promise<number> => {
-  const invocation = buildReducerInvocation(options);
-
-  return new Promise<number>((resolve, reject) => {
-    const child = spawn(invocation.command, invocation.args, {
-      cwd: invocation.cwd,
-      stdio: 'inherit'
-    });
-
-    child.on('error', reject);
-    child.on('close', code => {
-      if (code === null) {
-        reject(new Error('Reducer process exited without an exit code.'));
-        return;
-      }
-
-      resolve(code);
-    });
+  await runCatalogReduce({
+    cache: options.cache,
+    config: options.config,
+    dryRun: options.dryRun,
+    input: options.input,
+    invocationCwd,
+    output: options.output
   });
+
+  return 0;
 };

@@ -11,7 +11,7 @@ applyTo: '**'
 
 ## Required Verification Commands
 1. Generate filtered outputs from the canonical full input:
-   - `node reducer.js -i files/source/puma-catalog.xml -o files/filtered/puma-test-quality.xml -c config/test.json`
+   - `./bin/dev.js catalog reduce -i files/source/puma-catalog.xml -o files/filtered/puma-test-quality.xml -c config/test.json`
 2. Validate source/output integrity relationships:
    - `node scripts/validate-output-integrity.js -s files/source/puma-catalog.xml -c files/filtered/puma-test-quality.xml -i files/filtered/puma-test-quality-inventory.xml -p files/filtered/puma-test-quality-pricebook.xml`
 3. Manual spot-check of 5 products between source and filtered catalog (semantic comparison only):

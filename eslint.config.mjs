@@ -9,7 +9,7 @@ export default [
   },
   js.configs.recommended,
   {
-    files: ["bin/**/*.js", "scripts/**/*.js", "reducer.js", "lib/**/*.js", "test/**/*.js"],
+    files: ["bin/**/*.js", "scripts/**/*.js"],
     languageOptions: {
       ecmaVersion: "latest",
       globals: {
