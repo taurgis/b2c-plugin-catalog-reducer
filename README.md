@@ -203,6 +203,20 @@ A nested, more readable config shape is also accepted, discriminated by an expli
 
 See `config/friendly-example.json` for a complete example. Every field maps 1:1 to its canonical-shape equivalent; omitted fields/sections fall back to the same defaults as the flat shape. A `$schema` value other than `catalog-reducer-config@1` is rejected with a clear error rather than silently falling back to defaults.
 
+## Scaffolding A Config (`catalog init`)
+
+`catalog init` detects a catalog/pricebook/storefront folder structure and writes a starter config file, so you don't have to hand-write one from scratch:
+
+```bash
+npm run reduce -- catalog init --dir ./files/source --output ./catalog-reducer.json
+```
+
+- Detection is filename-based (case-insensitive) over `*.xml` files directly in `--dir` (default: the current directory): a name containing `pricebook` is treated as a pricebook source, `storefront` as a storefront source, `inventory` is ignored (inventory output is always generated, never sourced), and anything else is a master-catalog candidate.
+- If exactly one master-catalog candidate is found, it's used automatically. If detection finds zero or more than one candidate, you're prompted to pick or provide a path - unless `--catalog <path>` is passed explicitly, or `--yes` is set (in which case ambiguity fails with an actionable error instead of guessing).
+- `--yes` skips all interactive prompts (uses `--total`/`--master` flag values, or documented defaults) - use this for CI/scripted config generation.
+- `--force` allows overwriting an existing output file; without it, an existing file at the output path is left untouched and the command fails.
+- The generated config always uses the canonical flat shape (see above) and is always written to the explicit path you pass via `--output` - `init` never registers an implicit named profile; you still pass that same path to `catalog reduce -c <path>`.
+
 ## Examples
 
 Config file from an arbitrary path:
