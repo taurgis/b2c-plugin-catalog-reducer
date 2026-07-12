@@ -7,9 +7,18 @@ const { createHistogram } = require('perf_hooks');
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 
-// NOTE: this script requires `npm run build` to have been run first, since
-// it imports the compiled TypeScript output (src/lib/** -> dist/lib/**) that
-// superseded the retired root lib/** as of the M1 in-process TypeScript port.
+// This script requires `npm run build` to have been run first, since it
+// imports the compiled TypeScript output (src/lib/** -> dist/lib/**) that
+// superseded the retired root lib/** as of the M1 in-process TypeScript
+// port. dist/ is gitignored and not rebuilt by any test/lint script, so
+// fail fast with an actionable message instead of a raw module-not-found
+// error on a fresh clone (this does not detect a *stale* dist/ built
+// before a later src/ edit - only that it exists at all).
+if (!require('fs').existsSync(path.resolve(__dirname, '..', 'dist', 'lib', 'selectorConfig.js'))) {
+    console.error(`Missing ${path.resolve(__dirname, '..', 'dist', 'lib', 'selectorConfig.js')} - run \`npm run build\` first.`);
+    process.exit(1);
+}
+
 const { loadConfigFile } = require('../dist/lib/selectorConfig');
 const { parseCatalog } = require('../dist/lib/reduce');
 const { createSilentRuntime } = require('../dist/lib/runtimeSupport');

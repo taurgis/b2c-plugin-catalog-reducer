@@ -1,7 +1,7 @@
-import {getCategoryKey, selectByCategoryQuota} from '../categoryQuota';
+import {groupCandidatesByCategory, selectByCategoryQuota} from '../categoryQuota';
 import * as selectors from '../selectors';
 import {XmlNode} from '../types';
-import Filter from './filter';
+import Filter, {teardownProductStream} from './filter';
 
 /**
  * Fills remaining capacity with non-master products that have images.
@@ -24,25 +24,12 @@ export default class FillerProductsFilter extends Filter {
   }
 
   execute(): Promise<XmlNode[]> {
-    const candidatesByCategory = new Map<string, XmlNode[]>();
+    const candidates: XmlNode[] = [];
 
     return new Promise<XmlNode[]>((resolve, reject) => {
-      const {stream, xml} = this.openStream();
+      const streamHandle = this.openStream();
+      const {xml} = streamHandle;
       let isSettled = false;
-
-      const teardown = (): void => {
-        if (typeof xml.pause === 'function') {
-          xml.pause();
-        }
-
-        if (stream && !stream.destroyed) {
-          stream.destroy();
-        }
-
-        xml.removeAllListeners('tag:product');
-        xml.removeAllListeners('error');
-        xml.removeAllListeners('end');
-      };
 
       const settle = (error?: unknown): void => {
         if (isSettled) {
@@ -50,14 +37,14 @@ export default class FillerProductsFilter extends Filter {
         }
 
         isSettled = true;
-        teardown();
+        teardownProductStream(streamHandle);
 
         if (error) {
           reject(error);
           return;
         }
 
-        resolve(this.#selectFromCandidates(candidatesByCategory));
+        resolve(this.#selectFromCandidates(candidates));
       };
 
       xml.on('tag:product', (product: XmlNode) => {
@@ -75,15 +62,7 @@ export default class FillerProductsFilter extends Filter {
           const isMaster = selectors.isMaster(product);
 
           if (!isMaster && product.images) {
-            const categoryKey = getCategoryKey(product);
-            const bucket = candidatesByCategory.get(categoryKey);
-
-            if (bucket) {
-              bucket.push(product);
-            } else {
-              candidatesByCategory.set(categoryKey, [product]);
-            }
-
+            candidates.push(product);
             return;
           }
 
@@ -108,8 +87,9 @@ export default class FillerProductsFilter extends Filter {
     });
   }
 
-  #selectFromCandidates = (candidatesByCategory: Map<string, XmlNode[]>): XmlNode[] => {
+  #selectFromCandidates = (candidates: XmlNode[]): XmlNode[] => {
     const capacity = Math.max(0, this.runtimeState.totalTarget - this.statistics.total);
+    const candidatesByCategory = groupCandidatesByCategory(candidates);
     const selected = selectByCategoryQuota(candidatesByCategory, capacity);
 
     selected.forEach(product => {

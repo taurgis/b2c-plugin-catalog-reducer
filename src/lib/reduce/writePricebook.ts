@@ -2,7 +2,6 @@
 // pricebook with randomized amounts, or one filtered pricebook per
 // configured `pricebookSourceFiles` entry. Split out of the legacy
 // monolithic lib/parser.js.
-import '../vendor-shims';
 import fs from 'node:fs';
 import fsPromises from 'node:fs/promises';
 import path from 'node:path';

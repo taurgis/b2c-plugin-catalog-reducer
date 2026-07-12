@@ -1,6 +1,5 @@
 // Writes the primary reduced catalog XML output. Split out of the legacy
 // monolithic lib/parser.js.
-import '../vendor-shims';
 import fsPromises from 'node:fs/promises';
 
 import flow from 'xml-flow';

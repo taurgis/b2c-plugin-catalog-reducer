@@ -2,7 +2,6 @@
 // storefront writer step modules. Split out of the legacy monolithic
 // lib/parser.js so each writer module can depend on a small, focused set of
 // helpers instead of the entire former parser.js surface.
-import '../vendor-shims';
 import fs from 'node:fs';
 import fsPromises from 'node:fs/promises';
 import {spawn} from 'node:child_process';

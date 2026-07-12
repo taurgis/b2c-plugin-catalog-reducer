@@ -1,8 +1,29 @@
 import chalk from 'chalk';
 
 import {extractProductIds} from '../modelNormalization';
-import {openProductStream} from '../productXmlStream';
+import {openProductStream, ProductXmlStream} from '../productXmlStream';
 import {Logger, ProgressBar, SelectorConfig, XmlNode} from '../types';
+
+/**
+ * Shared stream-lifecycle teardown for the two places that open their own
+ * product stream and manage settle-once semantics: this class's own
+ * execute() below, and FillerProductsFilter#execute (which can't reuse
+ * execute() itself since it buffers a full pass before deciding anything,
+ * rather than deciding per streamed product).
+ */
+export const teardownProductStream = ({xml, stream}: ProductXmlStream): void => {
+  if (typeof xml.pause === 'function') {
+    xml.pause();
+  }
+
+  if (stream && !stream.destroyed) {
+    stream.destroy();
+  }
+
+  xml.removeAllListeners('tag:product');
+  xml.removeAllListeners('error');
+  xml.removeAllListeners('end');
+};
 
 const parseBoolean = (value: any): boolean => {
   if (Array.isArray(value)) {
@@ -242,23 +263,10 @@ export default class Filter {
     }
 
     return new Promise<XmlNode[]>(((resolve, reject) => {
-      const {stream, xml} = this.openStream();
+      const streamHandle = this.openStream();
+      const {xml} = streamHandle;
       let isSettled = false;
       const filterName = this.constructor.name;
-
-      const teardown = () => {
-        if (typeof xml.pause === 'function') {
-          xml.pause();
-        }
-
-        if (stream && !stream.destroyed) {
-          stream.destroy();
-        }
-
-        xml.removeAllListeners('tag:product');
-        xml.removeAllListeners('error');
-        xml.removeAllListeners('end');
-      };
 
       const settle = (error?: unknown, results?: XmlNode[]) => {
         if (isSettled) {
@@ -266,7 +274,7 @@ export default class Filter {
         }
 
         isSettled = true;
-        teardown();
+        teardownProductStream(streamHandle);
 
         if (error) {
           reject(error);

@@ -1,4 +1,3 @@
-import './vendor-shims';
 import chalk from 'chalk';
 import cliProgress from 'cli-progress';
 
@@ -32,11 +31,41 @@ const isProgressLike = (value: any): boolean => {
     && typeof value.setTotal === 'function';
 };
 
+// Loosely coerces a runtime flag value to a boolean. RuntimeOptions types
+// these fields as `boolean`, but callers outside the TypeScript-checked CLI
+// path (programmatic/library use) may pass other truthy/falsy
+// representations (e.g. from a config file or env var), so this recognizes
+// common non-boolean forms instead of silently treating anything that isn't
+// strictly `true`/`false` as the opposite of what was intended.
+const coerceRuntimeFlag = (value: unknown): boolean => {
+  if (typeof value === 'boolean') {
+    return value;
+  }
+
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+
+    if (normalized === 'false' || normalized === '0') {
+      return false;
+    }
+
+    if (normalized === 'true' || normalized === '1') {
+      return true;
+    }
+  }
+
+  if (typeof value === 'number') {
+    return value !== 0;
+  }
+
+  return Boolean(value);
+};
+
 // Recognized boolean runtime flags, declared once so adding a new one never
 // requires hand-syncing coercion/default logic across multiple call sites.
 const RUNTIME_FLAG_DEFAULTS: Record<string, {coerce: (value: unknown) => boolean; default: boolean}> = {
-  dryRun: {coerce: value => value === true, default: false},
-  useCache: {coerce: value => value !== false, default: true}
+  dryRun: {coerce: coerceRuntimeFlag, default: false},
+  useCache: {coerce: coerceRuntimeFlag, default: true}
 };
 
 const resolveRuntimeFlags = (source: Record<string, any> = {}): {dryRun: boolean; useCache: boolean} => Object.fromEntries(

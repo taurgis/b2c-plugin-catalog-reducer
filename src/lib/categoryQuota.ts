@@ -118,6 +118,29 @@ export const getCategoryKey = (product: Record<string, any>): string => {
 };
 
 /**
+ * Groups already-eligible candidates by category (see getCategoryKey).
+ * Shared by both call sites (FillerProductsFilter's own streamed pass, and
+ * FilterManager's capture-during-preferred-pass path) so the bucketing
+ * rule can't silently diverge between them.
+ */
+export const groupCandidatesByCategory = <T extends Record<string, any>>(candidates: T[]): Map<string, T[]> => {
+  const grouped = new Map<string, T[]>();
+
+  for (const candidate of candidates) {
+    const categoryKey = getCategoryKey(candidate);
+    const bucket = grouped.get(categoryKey);
+
+    if (bucket) {
+      bucket.push(candidate);
+    } else {
+      grouped.set(categoryKey, [candidate]);
+    }
+  }
+
+  return grouped;
+};
+
+/**
  * Groups candidates by category (see getCategoryKey) and selects up to
  * each category's proportional quota (see computeCategoryQuotas),
  * processing categories smallest-first so niche categories aren't starved

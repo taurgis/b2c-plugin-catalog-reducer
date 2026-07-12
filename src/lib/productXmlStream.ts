@@ -13,7 +13,6 @@
 //     still bring down the host process - that is an accepted, documented
 //     regression of moving this in-process (see M1 report), not something an
 //     adapter boundary can fix.
-import './vendor-shims';
 import {EventEmitter} from 'node:events';
 import fs from 'node:fs';
 

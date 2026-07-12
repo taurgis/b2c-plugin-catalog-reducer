@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 
-import {getCategoryKey, selectByCategoryQuota} from './categoryQuota';
+import {groupCandidatesByCategory, selectByCategoryQuota} from './categoryQuota';
 import Filter, {FilterRuntimeState, FilterStatistics} from './filters/filter';
 import {normalizeSelectedProducts} from './normalizeSelectedProducts';
 import {normalizeRuntimeOptions} from './runtimeSupport';
@@ -83,25 +83,12 @@ export default class FilterManager {
       return;
     }
 
-    const candidatesByCategory = new Map<string, XmlNode[]>();
-
-    for (const product of this.runtimeState.fillerCandidates!) {
+    const eligibleCandidates = this.runtimeState.fillerCandidates!.filter(product => {
       const productId = product && product.$attrs ? product.$attrs['product-id'] : null;
 
-      if (!productId || this.statistics.productIds.has(productId)) {
-        continue;
-      }
-
-      const categoryKey = getCategoryKey(product);
-      const bucket = candidatesByCategory.get(categoryKey);
-
-      if (bucket) {
-        bucket.push(product);
-      } else {
-        candidatesByCategory.set(categoryKey, [product]);
-      }
-    }
-
+      return Boolean(productId) && !this.statistics.productIds.has(productId);
+    });
+    const candidatesByCategory = groupCandidatesByCategory(eligibleCandidates);
     const selected = selectByCategoryQuota(candidatesByCategory, capacity);
 
     for (const product of selected) {
