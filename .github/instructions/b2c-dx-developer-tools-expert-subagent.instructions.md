@@ -30,7 +30,7 @@ When a trigger condition is met:
 This instruction is additive and does not replace existing governance requirements.
 
 1. Continue to follow `.github/instructions/pm-ba-subagent-research.instructions.md` for PM, BA, Senior QA Engineer, and Official Docs requirements.
-2. Continue to follow `.github/instructions/repo-research.instructions.md` before modifying guidance or making technical claims that depend on platform behavior.
+2. Continue to follow `.github/instructions/web-research.instructions.md` before modifying guidance or making technical claims that depend on platform behavior.
 3. Prefer official B2C Developer Tooling documentation when subagent advice and repository assumptions diverge.
 
 ## Binary Compliance Expectations
@@ -63,5 +63,5 @@ If it is unclear whether a request requires B2C DX Developer Tools Expert, or if
 
 - `.github/agents/b2c-dx-developer-tools-expert.agent.md`
 - `.github/instructions/pm-ba-subagent-research.instructions.md`
-- `.github/instructions/repo-research.instructions.md`
+- `.github/instructions/web-research.instructions.md`
 - https://salesforcecommercecloud.github.io/b2c-developer-tooling/

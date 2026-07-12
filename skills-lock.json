@@ -162,6 +162,27 @@
       "sourceHash": "04e51b471e5b3d5df824c53896730809284e1376a9698801773dc0b44ee2f928",
       "versionPolicy": "minor",
       "includePrerelease": false
+    },
+    "web-research": {
+      "source": "taurgis/bonsai",
+      "sourceType": "github",
+      "computedHash": "df53565f3d0759abab3ac2e1f160da2629171571ec749f32f569d9ec5d26bff0",
+      "ref": "main",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "repoPath": "agents/skills/web-research/SKILL.md",
+      "installPath": ".agents/skills/web-research",
+      "installHash": "039773fb324f98d3293e21ddde6506f2d78075ffe3e2bcf15aefdecef993081b",
+      "sourceHash": "df53565f3d0759abab3ac2e1f160da2629171571ec749f32f569d9ec5d26bff0",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "3.1.0",
+      "installVersion": "3.1.0"
     }
   },
   "instructions": {
@@ -237,24 +258,6 @@
       "versionPolicy": "minor",
       "includePrerelease": false
     },
-    ".github/instructions/repo-research.instructions.md": {
-      "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
-      "sourceType": "local",
-      "repoPath": ".github/instructions/repo-research.instructions.md",
-      "installPath": ".github/instructions/repo-research.instructions.md",
-      "computedHash": "891565a4d2c90b6a8d9b411ba85d6398b145a43139ea4765f9effbff264aaa1a",
-      "agents": [
-        "claude-code",
-        "cursor",
-        "codex",
-        "antigravity",
-        "github-copilot"
-      ],
-      "installHash": "891565a4d2c90b6a8d9b411ba85d6398b145a43139ea4765f9effbff264aaa1a",
-      "sourceHash": "71f0ed167f8af8fa214a9b86751b5eae2ef01e8b55c6d24ae5585ee85dab528d",
-      "versionPolicy": "minor",
-      "includePrerelease": false
-    },
     ".github/instructions/skill-maintenance.instructions.md": {
       "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
       "sourceType": "local",
@@ -272,6 +275,31 @@
       "sourceHash": "d1c5c74ea94e7aa7c8c2754d790df97bc529892070eed917a1ba3f42ed84077c",
       "versionPolicy": "minor",
       "includePrerelease": false
+    },
+    ".github/instructions/web-research.instructions.md": {
+      "source": "taurgis/bonsai",
+      "sourceType": "github",
+      "repoPath": "instructions/web-research.instructions.md",
+      "installPath": ".github/instructions/web-research.instructions.md",
+      "computedHash": "10de42cc58d2c3682549526e42bd45ed07506434afb5d280e56a360de43bf2be",
+      "ref": "main",
+      "subpath": "agents",
+      "agents": [
+        "claude-code",
+        "cursor",
+        "codex",
+        "antigravity",
+        "github-copilot"
+      ],
+      "linkedSkills": [
+        "web-research"
+      ],
+      "installHash": "10de42cc58d2c3682549526e42bd45ed07506434afb5d280e56a360de43bf2be",
+      "sourceHash": "97782c48807c3414d56f820953c649adcb4f8b6b35a064f32f81009ec124107c",
+      "versionPolicy": "minor",
+      "includePrerelease": false,
+      "sourceVersion": "4.1.0",
+      "installVersion": "4.1.0"
     },
     "AGENTS.md": {
       "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
@@ -330,11 +358,13 @@
       "includePrerelease": false
     },
     ".github/agents/official-docs-researcher.agent.md": {
-      "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
-      "sourceType": "local",
-      "repoPath": ".github/agents/official-docs-researcher.agent.md",
+      "source": "taurgis/bonsai",
+      "sourceType": "github",
+      "repoPath": "agents/official-docs-researcher.agent.md",
       "installPath": ".github/agents/official-docs-researcher.agent.md",
-      "computedHash": "e0a5818e8dd09d9eb4fc3a465afb81037328396ffce498f940b3a3ff60ef10b4",
+      "computedHash": "627fc72fd4304cdedfa45e2af234ea1f500cb25b33cb6a372bfc274c191689aa",
+      "ref": "main",
+      "subpath": "agents",
       "agents": [
         "claude-code",
         "cursor",
@@ -342,10 +372,12 @@
         "antigravity",
         "github-copilot"
       ],
-      "installHash": "e0a5818e8dd09d9eb4fc3a465afb81037328396ffce498f940b3a3ff60ef10b4",
-      "sourceHash": "1ac7c2976069b8db35811beaf2b8fa2a1c3db3528724b910b7de9e17aa56f029",
+      "installHash": "627fc72fd4304cdedfa45e2af234ea1f500cb25b33cb6a372bfc274c191689aa",
+      "sourceHash": "9fb4cb65c6afbdfcae54f827e97c92f11dd76923c276d48c81d9d6a4a5b78bd5",
       "versionPolicy": "minor",
-      "includePrerelease": false
+      "includePrerelease": false,
+      "sourceVersion": "4.1.0",
+      "installVersion": "4.1.0"
     },
     ".github/agents/project-manager.agent.md": {
       "source": "/Users/thomastheunen/Documents/Projects/b2c-plugin-catalog-reducer",
