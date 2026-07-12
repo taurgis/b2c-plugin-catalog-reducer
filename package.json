@@ -10,8 +10,6 @@
   "files": [
     "bin",
     "dist",
-    "lib",
-    "reducer.js",
     "xsd"
   ],
   "license": "MIT",
@@ -19,11 +17,11 @@
     "build": "tsc -p tsconfig.json",
     "start": "node ./bin/run.js catalog reduce",
     "reduce": "node ./bin/run.js catalog reduce",
-    "lint:root": "eslint \"src/**/*.ts\" \"bin/**/*.js\" \"scripts/**/*.js\" reducer.js \"lib/**/*.js\" \"test/**/*.js\"",
+    "lint:root": "eslint \"src/**/*.ts\" \"bin/**/*.js\" \"scripts/**/*.js\"",
     "lint": "npm run lint:root",
     "test:root": "vitest run",
-    "test": "npm run test:root && node --test test/**/*.test.js",
-    "test:coverage": "npm run test:root && c8 --all --check-coverage --per-file --lines 75 --branches 60 --statements 75 --exclude='test/**' --include='reducer.js' --include='lib/**/*.js' node --test test/**/*.test.js",
+    "test": "npm run test:root",
+    "test:coverage": "vitest run --coverage",
     "test:ci": "npm run lint && npm run test:coverage"
   },
   "dependencies": {
@@ -44,7 +42,7 @@
     "@types/node": "^20.11.0",
     "@typescript-eslint/eslint-plugin": "^8.56.1",
     "@typescript-eslint/parser": "^8.56.1",
-    "c8": "^10.1.3",
+    "@vitest/coverage-v8": "^4.1.10",
     "eslint": "^10.0.2",
     "globals": "^17.3.0",
     "ts-node": "^10.9.2",

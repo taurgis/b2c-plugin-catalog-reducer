@@ -9,8 +9,7 @@ This repository provides a catalog reducer for Salesforce B2C Commerce XML datas
 The tool reduces large catalog exports into smaller, representative fixtures and writes matching inventory and pricebook outputs.
 
 Tech stack:
-- Node.js CommonJS CLI
-- Root oclif command layer plus npm automation at the repository root
+- TypeScript oclif CLI plugin; the catalog reduce workflow runs in-process (no child-process spawn)
 - XML processing and validation via `xml-flow`, `node-expat`, `xml-formatter`, optional system `xmllint` formatting helpers, and `xmllint-wasm`
 
 ## Key Paths
@@ -18,16 +17,15 @@ Tech stack:
 - `.github/agents/`: custom subagents for governed repo work
 - `.github/instructions/`: repo workflow and subagent routing rules
 - `.agents/skills/`: reusable skills for plugin authoring and reducer maintenance
-- `bin/`: root oclif entrypoints
+- `bin/`: root oclif entrypoints (`bin/dev.js` transpiles `src/**` on the fly via ts-node; `bin/run.js` requires compiled `dist/**`)
 - `src/commands/`: root oclif command implementations
-- `src/lib/`: root wrapper helpers and command support code
-- `reducer.js`: reducer CLI entry point
-- `lib/`: parser, selection logic, XML output helpers
+- `src/lib/`: source of truth for parser, selection logic, and XML output helpers - compiles to `dist/lib/**`. `src/lib/reduce/**` holds the catalog-reduce orchestrator split into named steps (`selectAndNormalize`, `writeCatalog`, `writeInventory`, `writePricebook`, `writeStorefront`, plus the `runCatalogReduce`/`index` orchestrators). `src/lib/reducer-runner.ts` calls into it in-process.
 - `config/`: repository-local profiles and benchmark configs
-- `test/`: reducer coverage and regression checks
-- `scripts/`: benchmarks and output-integrity validation
+- `scripts/`: benchmarks and output-integrity validation; these import compiled `dist/lib/**`, so run `npm run build` before using them
 - `files/`: repository-local source and generated fixture XML samples
 - `xsd/`: XML schemas used for output validation
+
+Legacy `reducer.js`, root `lib/**`, and the Node `--test` suite under `test/**` have been retired: all of their behavior was ported to `src/lib/**` (with Vitest coverage under `src/lib/**/*.test.ts`) and verified byte-identical via a golden-master diff before removal.
 
 ## Mandatory Pre-Step
 

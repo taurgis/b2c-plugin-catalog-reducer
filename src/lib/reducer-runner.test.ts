@@ -1,70 +1,76 @@
-import {describe, expect, it} from 'vitest';
-import path from 'node:path';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {buildReducerInvocation} from './reducer-runner';
+const runCatalogReduce = vi.fn();
 
-describe('buildReducerInvocation', () => {
-  it('resolves relative paths from the caller working directory', () => {
-    const invocationCwd = path.join(process.cwd(), 'fixtures');
-    const invocation = buildReducerInvocation({
-      config: 'configs/local.json',
+vi.mock('./reduce/runCatalogReduce', () => ({
+  runCatalogReduce
+}));
+
+describe('runReducer', () => {
+  beforeEach(() => {
+    runCatalogReduce.mockReset();
+  });
+
+  it('forwards options to runCatalogReduce and defaults invocationCwd to process.cwd()', async () => {
+    runCatalogReduce.mockResolvedValue({dryRun: false, selectorConfig: {}});
+    const {runReducer} = await import('./reducer-runner');
+
+    await runReducer({
       input: 'files/source/puma-catalog.xml',
-      invocationCwd,
       output: 'files/filtered/puma-test.xml'
     });
 
-    expect(invocation.cwd).toBe(process.cwd());
-    expect(invocation.args).toContain(path.resolve(invocationCwd, 'configs/local.json'));
-    expect(invocation.args).toContain(path.resolve(invocationCwd, 'files/source/puma-catalog.xml'));
-    expect(invocation.args).toContain(path.resolve(invocationCwd, 'files/filtered/puma-test.xml'));
-    expect(invocation.args).toContain('-c');
-  });
-
-  it('preserves absolute paths', () => {
-    const invocation = buildReducerInvocation({
-      input: '/tmp/input.xml',
-      output: '/tmp/output.xml'
+    expect(runCatalogReduce).toHaveBeenCalledWith({
+      cache: undefined,
+      config: undefined,
+      dryRun: undefined,
+      input: 'files/source/puma-catalog.xml',
+      invocationCwd: process.cwd(),
+      output: 'files/filtered/puma-test.xml'
     });
-
-    expect(invocation.args).toContain('/tmp/input.xml');
-    expect(invocation.args).toContain('/tmp/output.xml');
   });
 
-  it('adds --dry-run when dryRun is set', () => {
-    const invocation = buildReducerInvocation({
-      dryRun: true,
-      input: '/tmp/input.xml',
-      output: '/tmp/output.xml'
-    });
+  it('forwards an explicit invocationCwd, config, dryRun, and cache through unchanged', async () => {
+    runCatalogReduce.mockResolvedValue({dryRun: true, selectorConfig: {}});
+    const {runReducer} = await import('./reducer-runner');
+    const invocationCwd = '/some/invocation/cwd';
 
-    expect(invocation.args).toContain('--dry-run');
-  });
-
-  it('omits --dry-run by default', () => {
-    const invocation = buildReducerInvocation({
-      input: '/tmp/input.xml',
-      output: '/tmp/output.xml'
-    });
-
-    expect(invocation.args).not.toContain('--dry-run');
-  });
-
-  it('adds --no-cache when cache is disabled', () => {
-    const invocation = buildReducerInvocation({
+    await runReducer({
       cache: false,
-      input: '/tmp/input.xml',
-      output: '/tmp/output.xml'
+      config: 'configs/local.json',
+      dryRun: true,
+      input: 'catalog.xml',
+      invocationCwd,
+      output: 'catalog-reduced.xml'
     });
 
-    expect(invocation.args).toContain('--no-cache');
+    expect(runCatalogReduce).toHaveBeenCalledWith({
+      cache: false,
+      config: 'configs/local.json',
+      dryRun: true,
+      input: 'catalog.xml',
+      invocationCwd,
+      output: 'catalog-reduced.xml'
+    });
   });
 
-  it('omits --no-cache when cache is left at its default', () => {
-    const invocation = buildReducerInvocation({
+  it('resolves 0 on success', async () => {
+    runCatalogReduce.mockResolvedValue({dryRun: false, selectorConfig: {}});
+    const {runReducer} = await import('./reducer-runner');
+
+    await expect(runReducer({
       input: '/tmp/input.xml',
       output: '/tmp/output.xml'
-    });
+    })).resolves.toBe(0);
+  });
 
-    expect(invocation.args).not.toContain('--no-cache');
+  it('propagates a rejection from runCatalogReduce', async () => {
+    runCatalogReduce.mockRejectedValue(new Error('boom'));
+    const {runReducer} = await import('./reducer-runner');
+
+    await expect(runReducer({
+      input: '/tmp/input.xml',
+      output: '/tmp/output.xml'
+    })).rejects.toThrow(/boom/);
   });
 });

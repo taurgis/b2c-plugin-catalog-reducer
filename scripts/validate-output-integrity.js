@@ -6,7 +6,10 @@ const process = require('process');
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 
-const { openProductStream } = require('../lib/productXmlStream');
+// NOTE: this script requires `npm run build` to have been run first, since
+// it imports the compiled TypeScript output (src/lib/** -> dist/lib/**) that
+// superseded the retired root lib/** as of the M1 in-process TypeScript port.
+const { openProductStream } = require('../dist/lib/productXmlStream');
 
 const resolveCliPath = inputPath => path.resolve(process.cwd(), inputPath);
 
