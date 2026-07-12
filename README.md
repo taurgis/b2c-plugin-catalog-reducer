@@ -94,6 +94,8 @@ Arguments:
 - `-c`, `--config`: path to a JSON config file anywhere on disk
 - `-i`, `--input`: source catalog XML file
 - `-o`, `--output`: reduced catalog output file
+- `--dry-run`: run product selection and print a summary without writing any output files
+- `--cache` / `--no-cache`: reuse a cached product selection when the input file and config are unchanged (enabled by default; use `--no-cache` to force a fresh parse)
 
 Relative input and output paths are resolved from the directory where you invoke `b2c`.
 
@@ -167,11 +169,14 @@ Config files can live anywhere. The example below works as a standalone JSON con
 			{ "id": "someOtherAttribute", "value": "some value", "count": 100 }
 		]
 	},
+	"onlineSiteIds": [],
 	"pricebookRandomSeed": null,
 	"pricebookSourceFiles": [],
 	"storefrontSourceFiles": []
 }
 ```
+
+- `onlineSiteIds`: restricts online status to the listed site IDs. A configured site counts as online if the product has an explicit site-specific `<online-flag site-id="...">true</online-flag>` for it, or, when that site has no explicit override, if the global `<online-flag>` is `true` (mirroring SFCC's per-site attribute inheritance). The product is kept if at least one configured site is online. Leave empty (the default) to keep the prior behavior: a product is online if any online-flag (site-specific or global) is `true`.
 
 ## Examples
 
@@ -185,6 +190,12 @@ Quick local validation run:
 
 ```bash
 npm run reduce -- -i files/source/puma-catalog.xml -o files/filtered/puma-test.xml -c ./config/test.json
+```
+
+Preview a reduction without writing any files:
+
+```bash
+npm run reduce -- -i files/source/puma-catalog.xml -o files/filtered/puma-test.xml -c ./config/test.json --dry-run
 ```
 
 Puma source-pricebook profile:
@@ -242,3 +253,4 @@ The reducer validates generated XML against the bundled schemas in `xsd/`.
 - The root `catalog reduce` command is a thin oclif wrapper around the reducer runtime.
 - The published package does not include the repository-local `config/`, `files/`, `tmp/`, `scripts/`, or `test/` directories.
 - The legacy `--project` / `-p` profile flag has been removed. Use `--config /path/to/file.json`.
+- Product selections are cached in a `.catalog-reducer-cache/` directory next to the source catalog XML file, keyed by the file's mtime/size and the effective config. The cache is invalidated automatically when either changes; delete the directory (or pass `--no-cache`) to force a fresh parse.

@@ -3,7 +3,9 @@ import {existsSync} from 'node:fs';
 import path from 'node:path';
 
 export type ReducerRunOptions = {
+  cache?: boolean;
   config?: string;
+  dryRun?: boolean;
   input: string;
   invocationCwd?: string;
   output: string;
@@ -59,6 +61,14 @@ export const buildReducerInvocation = (options: ReducerRunOptions): ReducerInvoc
 
   if (options.config) {
     args.push('-c', resolveConfigPath(options.config, invocationCwd));
+  }
+
+  if (options.dryRun) {
+    args.push('--dry-run');
+  }
+
+  if (options.cache === false) {
+    args.push('--no-cache');
   }
 
   return {

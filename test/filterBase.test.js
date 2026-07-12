@@ -85,3 +85,92 @@ test('base Filter settles on XML end when no products are emitted', async t => {
     assert.deepEqual(results, []);
     assert.equal(statistics.total, 0);
 });
+
+test('base Filter keeps any true online-flag when onlineSiteIds is not configured', async t => {
+    const inputFilename = await writeTempCatalog(
+        t,
+        '<product product-id="GLOBAL-ON"><online-flag>true</online-flag></product>'
+        + '<product product-id="SITE-B-ON">'
+        + '<online-flag site-id="SiteA">false</online-flag>'
+        + '<online-flag site-id="SiteB">true</online-flag>'
+        + '</product>'
+        + '<product product-id="ALL-SITES-OFF">'
+        + '<online-flag site-id="SiteA">false</online-flag>'
+        + '<online-flag site-id="SiteB">false</online-flag>'
+        + '</product>'
+    );
+
+    class CollectAllFilter extends Filter {
+        process(product) {
+            return Filter.NOT_FINISHED_WITH_PRODUCT(product);
+        }
+    }
+
+    const { selectorConfig, statistics, progress, runtimeState } = createFilterContext();
+    const filter = new CollectAllFilter(inputFilename, selectorConfig, statistics, progress, runtimeState);
+    const results = await filter.execute();
+    const keptIds = results.map(product => product.$attrs['product-id']);
+
+    assert.deepEqual(keptIds, ['GLOBAL-ON', 'SITE-B-ON']);
+});
+
+test('base Filter restricts online status to the configured site IDs', async t => {
+    const inputFilename = await writeTempCatalog(
+        t,
+        '<product product-id="GLOBAL-ON"><online-flag>true</online-flag></product>'
+        + '<product product-id="SITE-A-ON">'
+        + '<online-flag site-id="SiteA">true</online-flag>'
+        + '<online-flag site-id="SiteB">false</online-flag>'
+        + '</product>'
+        + '<product product-id="SITE-B-ON">'
+        + '<online-flag site-id="SiteA">false</online-flag>'
+        + '<online-flag site-id="SiteB">true</online-flag>'
+        + '</product>'
+        + '<product product-id="ALL-SITES-OFF">'
+        + '<online-flag site-id="SiteA">false</online-flag>'
+        + '<online-flag site-id="SiteB">false</online-flag>'
+        + '</product>'
+    );
+
+    class CollectAllFilter extends Filter {
+        process(product) {
+            return Filter.NOT_FINISHED_WITH_PRODUCT(product);
+        }
+    }
+
+    const { selectorConfig, statistics, progress, runtimeState } = createFilterContext();
+    selectorConfig.onlineSiteIds = ['SiteA'];
+
+    const filter = new CollectAllFilter(inputFilename, selectorConfig, statistics, progress, runtimeState);
+    const results = await filter.execute();
+    const keptIds = results.map(product => product.$attrs['product-id']);
+
+    assert.deepEqual(keptIds, ['GLOBAL-ON', 'SITE-A-ON']);
+});
+
+test('base Filter falls back to the global online-flag for a configured site with no explicit override', async t => {
+    const inputFilename = await writeTempCatalog(
+        t,
+        // SiteC has no explicit override; it should inherit the true global default
+        // even though this product also overrides an unrelated site (SiteA) to false.
+        '<product product-id="INHERITS-GLOBAL-FOR-SITE-C">'
+        + '<online-flag>true</online-flag>'
+        + '<online-flag site-id="SiteA">false</online-flag>'
+        + '</product>'
+    );
+
+    class CollectAllFilter extends Filter {
+        process(product) {
+            return Filter.NOT_FINISHED_WITH_PRODUCT(product);
+        }
+    }
+
+    const { selectorConfig, statistics, progress, runtimeState } = createFilterContext();
+    selectorConfig.onlineSiteIds = ['SiteC'];
+
+    const filter = new CollectAllFilter(inputFilename, selectorConfig, statistics, progress, runtimeState);
+    const results = await filter.execute();
+    const keptIds = results.map(product => product.$attrs['product-id']);
+
+    assert.deepEqual(keptIds, ['INHERITS-GLOBAL-FOR-SITE-C']);
+});

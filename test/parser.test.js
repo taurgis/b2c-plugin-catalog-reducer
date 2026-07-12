@@ -262,6 +262,87 @@ test('parse writes catalog, inventory and pricebook files', async t => {
     assert.match(pricebookOutput, /<amount quantity="1">\d+\.\d{2}<\/amount>/i);
 });
 
+test('parse in dry-run mode writes no output files', async t => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'catalog-reducer-parser-'));
+    t.after(async () => {
+        await fs.rm(tempDir, { recursive: true, force: true });
+    });
+
+    const inputFilename = path.join(tempDir, 'input.xml');
+    const outputFilename = path.join(tempDir, 'output.xml');
+
+    await fs.writeFile(inputFilename, buildCatalogXml(), 'utf8');
+    await parser.parse(
+        inputFilename,
+        outputFilename,
+        { ...baseConfig, total: 1 },
+        { ...createSilentRuntime(), dryRun: true }
+    );
+
+    assert.equal(await fileExists(outputFilename), false);
+    assert.equal(await fileExists(path.join(tempDir, 'output-inventory.xml')), false);
+    assert.equal(await fileExists(path.join(tempDir, 'output-pricebook.xml')), false);
+    assert.equal(await fileExists(path.join(tempDir, '.catalog-reducer-cache')), false);
+});
+
+test('parse reuses a cached selection on the next run and produces identical output', async t => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'catalog-reducer-parser-'));
+    t.after(async () => {
+        await fs.rm(tempDir, { recursive: true, force: true });
+    });
+
+    const inputFilename = path.join(tempDir, 'input.xml');
+    const firstOutputFilename = path.join(tempDir, 'first-output.xml');
+    const secondOutputFilename = path.join(tempDir, 'second-output.xml');
+    const config = { ...baseConfig, total: 1 };
+
+    await fs.writeFile(inputFilename, buildCatalogXml(), 'utf8');
+    await parser.parse(inputFilename, firstOutputFilename, config, createSilentRuntime());
+
+    const cacheDir = path.join(tempDir, '.catalog-reducer-cache');
+    const cacheEntriesAfterFirstRun = await fs.readdir(cacheDir);
+    assert.equal(cacheEntriesAfterFirstRun.length, 1);
+
+    const logMessages = [];
+    const runtimeWithLogger = {
+        ...createSilentRuntime(),
+        logger: {
+            info: message => logMessages.push(String(message)),
+            warn: () => {},
+            error: () => {}
+        }
+    };
+
+    await parser.parse(inputFilename, secondOutputFilename, config, runtimeWithLogger);
+
+    assert.ok(logMessages.some(message => /Using cached product selection/.test(message)));
+    assert.equal(
+        await fs.readFile(firstOutputFilename, 'utf8'),
+        await fs.readFile(secondOutputFilename, 'utf8')
+    );
+});
+
+test('parse with caching disabled does not read or write the cache', async t => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'catalog-reducer-parser-'));
+    t.after(async () => {
+        await fs.rm(tempDir, { recursive: true, force: true });
+    });
+
+    const inputFilename = path.join(tempDir, 'input.xml');
+    const outputFilename = path.join(tempDir, 'output.xml');
+
+    await fs.writeFile(inputFilename, buildCatalogXml(), 'utf8');
+    await parser.parse(
+        inputFilename,
+        outputFilename,
+        { ...baseConfig, total: 1 },
+        { ...createSilentRuntime(), useCache: false }
+    );
+
+    assert.equal(await fileExists(outputFilename), true);
+    assert.equal(await fileExists(path.join(tempDir, '.catalog-reducer-cache')), false);
+});
+
 test('parse still resolves catalog-id when file has a long preamble', async t => {
     const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'catalog-reducer-parser-'));
     t.after(async () => {

@@ -29,6 +29,16 @@ const argv = yargs
         type: 'string',
         demandOption : true
     })
+    .option('dry-run', {
+        description: 'Run product selection and print a summary without writing any output files.',
+        type: 'boolean',
+        default: false
+    })
+    .option('cache', {
+        description: 'Reuse a cached product selection when the input file and config are unchanged. Use --no-cache to force a fresh parse.',
+        type: 'boolean',
+        default: true
+    })
     .help()
     .alias('help', 'h')
     .hide('project')
@@ -50,7 +60,13 @@ async function main() {
     console.log(chalk.yellow(JSON.stringify(config, null, 4)));
     console.log(chalk.yellow('------------------------------\n'));
 
-    await parser.parse(inputFilename, outputFilename, config);
+    await parser.parse(inputFilename, outputFilename, config, { dryRun: argv.dryRun, useCache: argv.cache });
+
+    if (argv.dryRun) {
+        console.log(chalk.yellow('Dry run complete. No files were written; skipping XSD validation.'));
+        return;
+    }
+
     console.log(chalk.yellow('Validating generated XML files against XSD schemas'));
     await xmlSchemaValidator.validateGeneratedOutputs(outputFilename, undefined, config);
     console.log(chalk.green('XSD validation passed.'));

@@ -55,3 +55,4 @@ Thumbs.db
 /config/*
 !/config/default.json
 !/config/benchmark1000.json
+.catalog-reducer-cache/

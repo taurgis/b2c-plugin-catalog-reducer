@@ -23,7 +23,9 @@ describe('catalog reduce command', () => {
     ]);
 
     expect(runReducer).toHaveBeenCalledWith({
+      cache: true,
       config: undefined,
+      dryRun: false,
       input: 'files/source/puma-catalog.xml',
       invocationCwd: process.cwd(),
       output: 'files/filtered/puma-test.xml'
@@ -44,10 +46,35 @@ describe('catalog reduce command', () => {
     ]);
 
     expect(runReducer).toHaveBeenCalledWith({
+      cache: true,
       config: 'configs/catalog-reducer.json',
+      dryRun: false,
       input: 'catalog.xml',
       invocationCwd: process.cwd(),
       output: 'catalog-reduced.xml'
+    });
+  });
+
+  it('passes --dry-run and --no-cache through to the wrapper', async () => {
+    runReducer.mockResolvedValue(0);
+    const {default: CatalogReduce} = await import('./reduce');
+
+    await CatalogReduce.run([
+      '--input',
+      'files/source/puma-catalog.xml',
+      '--output',
+      'files/filtered/puma-test.xml',
+      '--dry-run',
+      '--no-cache'
+    ]);
+
+    expect(runReducer).toHaveBeenCalledWith({
+      cache: false,
+      config: undefined,
+      dryRun: true,
+      input: 'files/source/puma-catalog.xml',
+      invocationCwd: process.cwd(),
+      output: 'files/filtered/puma-test.xml'
     });
   });
 

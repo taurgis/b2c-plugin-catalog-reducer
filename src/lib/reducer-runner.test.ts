@@ -29,4 +29,42 @@ describe('buildReducerInvocation', () => {
     expect(invocation.args).toContain('/tmp/input.xml');
     expect(invocation.args).toContain('/tmp/output.xml');
   });
+
+  it('adds --dry-run when dryRun is set', () => {
+    const invocation = buildReducerInvocation({
+      dryRun: true,
+      input: '/tmp/input.xml',
+      output: '/tmp/output.xml'
+    });
+
+    expect(invocation.args).toContain('--dry-run');
+  });
+
+  it('omits --dry-run by default', () => {
+    const invocation = buildReducerInvocation({
+      input: '/tmp/input.xml',
+      output: '/tmp/output.xml'
+    });
+
+    expect(invocation.args).not.toContain('--dry-run');
+  });
+
+  it('adds --no-cache when cache is disabled', () => {
+    const invocation = buildReducerInvocation({
+      cache: false,
+      input: '/tmp/input.xml',
+      output: '/tmp/output.xml'
+    });
+
+    expect(invocation.args).toContain('--no-cache');
+  });
+
+  it('omits --no-cache when cache is left at its default', () => {
+    const invocation = buildReducerInvocation({
+      input: '/tmp/input.xml',
+      output: '/tmp/output.xml'
+    });
+
+    expect(invocation.args).not.toContain('--no-cache');
+  });
 });

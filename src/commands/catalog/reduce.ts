@@ -27,6 +27,15 @@ export default class CatalogReduce extends Command {
       char: 'o',
       description: 'Reduced catalog output XML file.',
       required: true
+    }),
+    'dry-run': Flags.boolean({
+      default: false,
+      description: 'Run product selection and print a summary without writing any output files.'
+    }),
+    cache: Flags.boolean({
+      allowNo: true,
+      default: true,
+      description: 'Reuse a cached product selection when the input file and config are unchanged.'
     })
   };
 
@@ -35,7 +44,9 @@ export default class CatalogReduce extends Command {
 
     try {
       const exitCode = await runReducer({
+        cache: flags.cache,
         config: flags.config,
+        dryRun: flags['dry-run'],
         input: flags.input,
         invocationCwd: process.cwd(),
         output: flags.output
