@@ -15,6 +15,7 @@ Repository-local fixtures and sample profiles under `files/` and `config/` are f
 - Supports generated or source-derived pricebook outputs
 - Validates generated XML against the bundled catalog, inventory, and pricebook schemas
 - Includes repeatable benchmark and output-integrity tooling
+- **Experimental:** downloads product images for a reduced catalog from a live B2C sandbox over WebDAV (`catalog images download`)
 
 ## Prerequisites
 
@@ -30,6 +31,7 @@ Official plugin lifecycle commands are documented in the Salesforce B2C Develope
 System requirements:
 
 - No external XML validator is required. XSD validation runs through the bundled `xmllint-wasm` dependency.
+- Node.js `>=22.16.0` is required (enforced via `package.json` `engines`). This is needed for `catalog images download`, which depends on the ESM-only `@salesforce/b2c-tooling-sdk` and relies on Node's `require(esm)` support (stable since Node 22).
 
 ## Repository Setup
 
@@ -216,6 +218,24 @@ npm run reduce -- catalog init --dir ./files/source --output ./catalog-reducer.j
 - `--yes` skips all interactive prompts (uses `--total`/`--master` flag values, or documented defaults) - use this for CI/scripted config generation.
 - `--force` allows overwriting an existing output file; without it, an existing file at the output path is left untouched and the command fails.
 - The generated config always uses the canonical flat shape (see above) and is always written to the explicit path you pass via `--output` - `init` never registers an implicit named profile; you still pass that same path to `catalog reduce -c <path>`.
+
+## Downloading Product Images (`catalog images download`) — Experimental
+
+`catalog images download` reads the product images referenced in an already-reduced catalog XML file (the output of `catalog reduce`) and downloads them from a live B2C sandbox over WebDAV:
+
+```bash
+b2c catalog images download -i ./catalog-reduced.xml -o ./images --library-path mylibrary/default
+```
+
+- `-i`, `--input`: the reduced catalog XML file to read image paths from
+- `-o`, `--output`: local directory to download images into
+- `--library-path`: path under the WebDAV `Libraries` root to this catalog's image library (e.g. `mylibrary/default`). This is instance-specific - configured in Business Manager under Site Development > WebDAV Access - and has no default.
+- `--dry-run`: list resolved image counts and destinations without downloading or making any network calls
+- `--concurrency`: maximum number of images to download at once (default: `4`)
+
+This command takes no credential flags of its own. Sandbox authentication is resolved the same way as other B2C CLI commands - via `dw.json`, environment variables, or `~/.mobify`.
+
+This command is experimental: its flags and behavior may change, and it is not yet covered by a live-sandbox integration test suite (only mocked WebDAV tests). Node.js `>=22.16.0` is required (see Prerequisites).
 
 ## Examples
 
