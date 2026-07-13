@@ -12,7 +12,18 @@ import Filter, {FilterResult} from './filter';
 // hard ceiling, though: this tool targets multi-GB catalog exports parsed
 // in-process, so buffering literally every eligible candidate in an
 // image-heavy catalog is a real OOM risk without some bound.
+//
+// Known limitation: any finite cap can still reintroduce the same
+// first-streamed-category bias this comment warns against, once a catalog
+// has more eligible candidates than the cap allows - the cap only raises
+// the catalog size at which that becomes possible. A fully bias-proof fix
+// would need per-category bounded capture (e.g. reservoir sampling) rather
+// than one global cap; that is a larger change to the capture/quota
+// pipeline than this constant tune, so `captureFillerCandidate` below logs
+// a warning the first time the cap is actually hit, making the risk this
+// comment describes observable instead of silent.
 const MINIMUM_CAPTURED_FILLER_CANDIDATES = 5000;
+const MAXIMUM_CAPTURED_FILLER_CANDIDATES = 250000;
 const CAPTURED_FILLER_CANDIDATES_MULTIPLIER = 50;
 
 /**
@@ -27,6 +38,23 @@ const CAPTURED_FILLER_CANDIDATES_MULTIPLIER = 50;
  * category-proportional quotas (see ../categoryQuota.ts).
  */
 export default class PreferredProductsFilter extends Filter {
+  private maxCapturedCandidates?: number;
+  private hasWarnedAboutCapturedFillerCap = false;
+
+  // `totalTarget` is already stable by the time this filter's pass runs
+  // (only the earlier master-product passes mutate it), so this cap is
+  // computed once and cached rather than recomputed on every candidate.
+  private getMaxCapturedCandidates(): number {
+    if (this.maxCapturedCandidates === undefined) {
+      this.maxCapturedCandidates = Math.min(
+        Math.max(this.runtimeState.totalTarget * CAPTURED_FILLER_CANDIDATES_MULTIPLIER, MINIMUM_CAPTURED_FILLER_CANDIDATES),
+        MAXIMUM_CAPTURED_FILLER_CANDIDATES
+      );
+    }
+
+    return this.maxCapturedCandidates;
+  }
+
   captureFillerCandidate(product: XmlNode, isMasterProduct: boolean): void {
     if (!this.runtimeState.enableCapturedFiller || !this.hasCapacity()) {
       return;
@@ -50,12 +78,16 @@ export default class PreferredProductsFilter extends Filter {
       return;
     }
 
-    const maxCapturedCandidates = Math.max(
-      this.runtimeState.totalTarget * CAPTURED_FILLER_CANDIDATES_MULTIPLIER,
-      MINIMUM_CAPTURED_FILLER_CANDIDATES
-    );
+    if (this.runtimeState.fillerCandidates!.length >= this.getMaxCapturedCandidates()) {
+      if (!this.hasWarnedAboutCapturedFillerCap) {
+        this.hasWarnedAboutCapturedFillerCap = true;
+        this.logger.warn(
+          `Reached the captured-filler-candidate cap (${this.getMaxCapturedCandidates()}). `
+          + 'Categories not yet seen in the source file may be under-represented in the '
+          + 'category-proportional filler selection.'
+        );
+      }
 
-    if (this.runtimeState.fillerCandidates!.length >= maxCapturedCandidates) {
       return;
     }
 

@@ -5,20 +5,9 @@ const path = require('path');
 const process = require('process');
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
+const { ensureDistBuilt } = require('./lib/ensureDistBuilt');
 
-// This script requires `npm run build` to have been run first, since it
-// imports the compiled TypeScript output (src/lib/** -> dist/lib/**) that
-// superseded the retired root lib/** as of the M1 in-process TypeScript
-// port. dist/ is gitignored and not rebuilt by any test/lint script, so
-// fail fast with an actionable message instead of a raw module-not-found
-// error on a fresh clone (this does not detect a *stale* dist/ built
-// before a later src/ edit - only that it exists at all).
-const distProductXmlStreamPath = path.resolve(__dirname, '..', 'dist', 'lib', 'productXmlStream.js');
-
-if (!fs.existsSync(distProductXmlStreamPath)) {
-    console.error(`Missing ${distProductXmlStreamPath} - run \`npm run build\` first.`);
-    process.exit(1);
-}
+ensureDistBuilt('dist/lib/productXmlStream.js');
 
 const { openProductStream } = require('../dist/lib/productXmlStream');
 const { DEPRECATED_CATALOG_ELEMENT_KEYS } = require('../dist/lib/productModelFixers/fixDeprecatedElements');

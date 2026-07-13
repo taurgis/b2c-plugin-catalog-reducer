@@ -15,6 +15,16 @@ import Filter, {teardownProductStream} from './filter';
  * category-proportional selection needs to know the full candidate pool
  * (and each category's size) before it can compute quotas, so every
  * eligible candidate is buffered for one full pass over the file.
+ *
+ * Known limitation: unlike PreferredProductsFilter's opportunistic capture
+ * (see preferredProductsFilter.ts), `candidates` here has no cap - adding
+ * one would reintroduce the same first-streamed-category bias this
+ * filter's whole design exists to avoid, so on a sufficiently large,
+ * image-heavy, "total-only" catalog (the case that routes here instead of
+ * the opportunistic path) this buffer is a real OOM risk with no bound.
+ * Fixing this without sacrificing quota accuracy needs per-category
+ * bounded capture (e.g. reservoir sampling) shared with
+ * preferredProductsFilter.ts, not a standalone cap on this array.
  */
 export default class FillerProductsFilter extends Filter {
   static usesStandaloneFillerCapture = true;

@@ -279,7 +279,7 @@ describe('FilterManager pipeline', () => {
     expect(filter.shouldSkip()).toBe(true);
   });
 
-  it('preferred products filter captures every eligible filler candidate uncapped, and excludes master-linked products', () => {
+  it('preferred products filter captures eligible filler candidates up to a cap, and excludes master-linked products', () => {
     const {filter, runtimeState} = createPreferredProductsFilter({
       preferredProductIds: [],
       enableCapturedFiller: true,
@@ -329,9 +329,10 @@ describe('FilterManager pipeline', () => {
     // Excluded via the master-linked check above, so not captured.
     expect(runtimeState.fillerCandidates!.length).toBe(0);
 
-    // Capture is not capped to totalTarget - computeCategoryQuotas needs
-    // the true size of every category to apportion correctly, so every
-    // eligible candidate found during this pass is kept.
+    // Capture is not capped to totalTarget itself - computeCategoryQuotas
+    // needs a representative view of every category to apportion
+    // correctly - but it is bounded by a much higher hard ceiling (see
+    // preferredProductsFilter.ts), well above the 150 candidates below.
     for (let i = 0; i < 150; i++) {
       filter.process({
         $attrs: {
@@ -350,5 +351,33 @@ describe('FilterManager pipeline', () => {
     }
 
     expect(runtimeState.fillerCandidates!.length).toBe(150);
+  });
+
+  it('preferred products filter stops capturing filler candidates once the cap is reached', () => {
+    const {filter, runtimeState} = createPreferredProductsFilter({
+      preferredProductIds: [],
+      enableCapturedFiller: true,
+      // totalTarget * 50 = 100, below the 5000 floor, so the effective cap is 5000.
+      totalTarget: 2
+    });
+
+    for (let i = 0; i < 5010; i++) {
+      filter.process({
+        $attrs: {
+          'product-id': `FILL-${i}`
+        },
+        images: {
+          'image-group': {
+            image: {
+              $attrs: {
+                path: `/fill-${i}.jpg`
+              }
+            }
+          }
+        }
+      });
+    }
+
+    expect(runtimeState.fillerCandidates!.length).toBe(5000);
   });
 });

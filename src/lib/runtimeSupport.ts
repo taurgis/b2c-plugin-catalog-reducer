@@ -31,12 +31,18 @@ const isProgressLike = (value: any): boolean => {
     && typeof value.setTotal === 'function';
 };
 
+const FALSY_FLAG_STRINGS = new Set(['false', '0', 'no', 'off', 'n']);
+const TRUTHY_FLAG_STRINGS = new Set(['true', '1', 'yes', 'on', 'y']);
+
 // Loosely coerces a runtime flag value to a boolean. RuntimeOptions types
 // these fields as `boolean`, but callers outside the TypeScript-checked CLI
 // path (programmatic/library use) may pass other truthy/falsy
 // representations (e.g. from a config file or env var), so this recognizes
 // common non-boolean forms instead of silently treating anything that isn't
-// strictly `true`/`false` as the opposite of what was intended.
+// strictly `true`/`false` as the opposite of what was intended. Only called
+// for values actually present on the source object (see
+// `resolveRuntimeFlags`) - `undefined`/absent always falls back to the
+// flag's own default rather than reaching this function.
 const coerceRuntimeFlag = (value: unknown): boolean => {
   if (typeof value === 'boolean') {
     return value;
@@ -45,11 +51,11 @@ const coerceRuntimeFlag = (value: unknown): boolean => {
   if (typeof value === 'string') {
     const normalized = value.trim().toLowerCase();
 
-    if (normalized === 'false' || normalized === '0') {
+    if (FALSY_FLAG_STRINGS.has(normalized)) {
       return false;
     }
 
-    if (normalized === 'true' || normalized === '1') {
+    if (TRUTHY_FLAG_STRINGS.has(normalized)) {
       return true;
     }
   }
@@ -70,7 +76,12 @@ const RUNTIME_FLAG_DEFAULTS: Record<string, {coerce: (value: unknown) => boolean
 
 const resolveRuntimeFlags = (source: Record<string, any> = {}): {dryRun: boolean; useCache: boolean} => Object.fromEntries(
   Object.entries(RUNTIME_FLAG_DEFAULTS).map(([key, {coerce, default: defaultValue}]) => (
-    [key, key in source ? coerce(source[key]) : defaultValue]
+    // `source[key] === undefined` is treated the same as the key being
+    // absent entirely - a present-but-undefined value (e.g. `{cache:
+    // options.cache}` when the caller omitted `cache`) means "not
+    // specified", not "explicitly falsy", and must fall back to the
+    // flag's own default rather than being coerced.
+    [key, key in source && source[key] !== undefined ? coerce(source[key]) : defaultValue]
   ))
 ) as {dryRun: boolean; useCache: boolean};
 

@@ -29,6 +29,21 @@ describe('runtimeSupport', () => {
       expect(normalizeRuntimeOptions({useCache: 'false' as any}).useCache).toBe(false);
       expect(normalizeRuntimeOptions({useCache: 'FALSE' as any}).useCache).toBe(false);
     });
+
+    it('recognizes additional common on/off spellings', () => {
+      expect(normalizeRuntimeOptions({useCache: 'no' as any}).useCache).toBe(false);
+      expect(normalizeRuntimeOptions({useCache: 'off' as any}).useCache).toBe(false);
+      expect(normalizeRuntimeOptions({dryRun: 'yes' as any}).dryRun).toBe(true);
+      expect(normalizeRuntimeOptions({dryRun: 'on' as any}).dryRun).toBe(true);
+    });
+
+    it('falls back to each flag\'s own default when the key is present but undefined', () => {
+      // A caller forwarding `{cache: options.cache}` when `options.cache`
+      // was never set produces exactly this shape - it must not be
+      // coerced to `false` regardless of the flag's default.
+      expect(normalizeRuntimeOptions({useCache: undefined}).useCache).toBe(true);
+      expect(normalizeRuntimeOptions({dryRun: undefined}).dryRun).toBe(false);
+    });
   });
 
   describe('createSilentRuntime', () => {
